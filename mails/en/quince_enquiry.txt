@@ -1,4 +1,4 @@
-{shop_name} — a question about a product
+{shop_name}: a question about a product
 
 Hello {expert_name},
 
