@@ -96,7 +96,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
         return (bool) Mail::Send(
             $this->jezykSzablonu((int) $this->context->language->id, 'quince_enquiry'),
             'quince_enquiry',
-            $nazwaSklepu . ' — ' . $produkt->name,
+            $nazwaSklepu . ': ' . $produkt->name,
             [
                 '{shop_name}' => $nazwaSklepu,
                 '{expert_name}' => (string) $osoba['name'],
