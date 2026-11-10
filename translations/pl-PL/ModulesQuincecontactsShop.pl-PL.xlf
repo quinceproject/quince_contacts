@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en-US" target-language="pl-PL" datatype="plaintext" original="ModulesQuincecontactsShop">
+    <body>
+
+      <!-- Komunikaty formularza -->
+      <trans-unit id="quince.contacts.shop.blad.puste">
+        <source>Fill in the email and the message.</source>
+        <target>Wpisz adres e-mail i wiadomość.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.blad.email">
+        <source>This is not a valid email address.</source>
+        <target>To nie jest poprawny adres e-mail.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.blad.wysylka">
+        <source>The message could not be sent. Please try again in a moment.</source>
+        <target>Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę.</target>
+      </trans-unit>
+
+      <!-- Przycisk na karcie produktu i panel boczny -->
+      <trans-unit id="quince.contacts.shop.przycisk">
+        <source>Ask an expert</source>
+        <target>Zapytaj specjalistę</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.tytul">
+        <source>Need a hand?</source>
+        <target>Potrzebujesz pomocy?</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.specjalista">
+        <source>Specialist</source>
+        <target>Specjalista</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.albo">
+        <source>or write to us</source>
+        <target>albo napisz do nas</target>
+      </trans-unit>
+
+      <!-- Pola formularza -->
+      <trans-unit id="quince.contacts.shop.pole.imie">
+        <source>Your name</source>
+        <target>Imię i nazwisko</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.pole.email">
+        <source>Your email address</source>
+        <target>Twój adres e-mail</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.pole.wiadomosc">
+        <source>Your message</source>
+        <target>Twoja wiadomość</target>
+      </trans-unit>
+
+      <!-- Po wysłaniu; po „It went to” stoi nazwa osoby i kropka -->
+      <trans-unit id="quince.contacts.shop.wyslano">
+        <source>The message is on its way</source>
+        <target>Wiadomość jest w drodze</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.wyslano.do">
+        <source>It went to</source>
+        <target>Trafiła do</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.wyslano.odpowiedz">
+        <source>The answer comes back to the address you gave.</source>
+        <target>Odpowiedź przyjdzie na podany przez Ciebie adres.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.wyslij">
+        <source>Send the message</source>
+        <target>Wyślij wiadomość</target>
+      </trans-unit>
+
+    </body>
+  </file>
+</xliff>

@@ -129,6 +129,28 @@
         <source>Person added.</source>
         <target>Osoba dodana.</target>
       </trans-unit>
+      <trans-unit id="quince.contacts.csrf">
+        <source>Invalid security token, please try again.</source>
+        <target>Nieprawidłowy token bezpieczeństwa, spróbuj ponownie.</target>
+      </trans-unit>
+
+      <!-- Osoba odpowiadająca za resztę sklepu -->
+      <trans-unit id="quince.contacts.reszta.za_duzo">
+        <source>Only one person can answer for the rest of the shop, and you picked %people%. Nothing was changed here.</source>
+        <target>Za resztę sklepu może odpowiadać tylko jedna osoba, a wskazano: %people%. Tu nic nie zostało zmienione.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.reszta">
+        <source>Rest of the shop</source>
+        <target>Reszta sklepu</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.reszta.przelacznik">
+        <source>Answers where no one is assigned</source>
+        <target>Odpowiada tam, gdzie nikt nie jest przypisany</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.reszta.wskazowka">
+        <source>Only one person can take this. Products from categories without anybody assigned show them; without it those pages have no “Ask an expert” button.</source>
+        <target>Tę rolę może mieć tylko jedna osoba. Pokazują ją produkty z kategorii bez przypisanej osoby; bez niej te strony nie mają przycisku „Zapytaj specjalistę”.</target>
+      </trans-unit>
 
     </body>
   </file>
