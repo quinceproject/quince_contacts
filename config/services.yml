@@ -1,0 +1,41 @@
+services:
+  _defaults:
+    public: true
+
+    # Te trzy linie są obowiązkowe w każdym naszym module.
+    #
+    # PrestaShop wyszukuje kontrolery modułów wyrażeniem regularnym po treści pliku
+    # (`class X extends FrameworkBundleAdminController`) i dopiero wtedy dokłada im
+    # tagi, dzięki którym Symfony podaje kontrolerowi jego lokalizator usług.
+    # Nasze kontrolery dziedziczą po wspólnej klasie silnika, więc ten wzorzec
+    # nie pasuje — deklarujemy to sami zamiast liczyć na wykrycie.
+    autoconfigure: true
+    autowire: true
+    tags: ['controller.service_arguments']
+
+  Quince\Contacts\Controller\Admin\PeopleController:
+    class: Quince\Contacts\Controller\Admin\PeopleController
+    arguments:
+      - '@Quince\Contacts\Settings\People'
+      - '@Quince\Contacts\Settings\PhotoStore'
+      - '@PrestaShop\PrestaShop\Core\ExtraProperty\Value\ExtraPropertyWriterInterface'
+      - '@PrestaShop\PrestaShop\Core\ExtraProperty\Value\ExtraPropertyReaderInterface'
+
+  Quince\Contacts\Settings\People:
+    class: Quince\Contacts\Settings\People
+
+  Quince\Contacts\Settings\PhotoStore:
+    class: Quince\Contacts\Settings\PhotoStore
+
+  Quince\Contacts\Settings\MessageLog:
+    class: Quince\Contacts\Settings\MessageLog
+
+  # Zasób Admin API rdzeń wczytuje sam z `src/ApiPlatform/Resources`, ale
+  # dostawcę trzeba zarejestrować jak każdą inną usługę (ten sam wzorzec co
+  # w quince_withdrawal).
+  Quince\Contacts\ApiPlatform\Provider\ContactMessageProvider:
+    class: Quince\Contacts\ApiPlatform\Provider\ContactMessageProvider
+    arguments:
+      - '@Quince\Contacts\Settings\MessageLog'
+      - '@request_stack'
+    tags: ['api_platform.state_provider']

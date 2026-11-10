@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en-US" target-language="pl-PL" datatype="plaintext" original="ModulesQuincecontactsAdmin">
+    <body>
+
+      <trans-unit id="quince.contacts.nazwa">
+        <source>Quince contacts</source>
+        <target>Quince: kontakty</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.opis">
+        <source>Shows the people behind the shop: photo, position and phone, next to the products they know.</source>
+        <target>Pokazuje ludzi ze sklepu: zdjęcie, stanowisko i telefon, przy produktach z ich działu.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.odinstalowanie">
+        <source>Uninstall the module? Photos, job titles and category assignments will be removed. Phone numbers stay with the shop contacts.</source>
+        <target>Odinstalować moduł? Zdjęcia, stanowiska i przypisania do kategorii znikną. Telefony zostaną przy kontaktach sklepu.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.etykieta">
+        <source>Contacts</source>
+        <target>Kontakty</target>
+      </trans-unit>
+
+      <trans-unit id="quince.contacts.wstep">
+        <source>Add the contacts and specialists your customers can reach.</source>
+        <target>Dodaj kontakty i specjalistów, z którymi mogą skontaktować się twoi klienci.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.wstep.odnosnik">
+        <source>Open the list of contacts</source>
+        <target>Otwórz listę kontaktów</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.zapisz">
+        <source>Save changes</source>
+        <target>Zapisz zmiany</target>
+      </trans-unit>
+
+      <trans-unit id="quince.contacts.karta">
+        <source>People in your shop</source>
+        <target>Ludzie w twoim sklepie</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.pusto">
+        <source>Nobody here yet.</source>
+        <target>Jeszcze nikogo tu nie ma.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.doUsuniecia">
+        <source>will disappear when you save</source>
+        <target>zniknie po zapisaniu</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.kategorie.brak">
+        <source>no categories yet</source>
+        <target>brak kategorii</target>
+      </trans-unit>
+
+      <trans-unit id="quince.contacts.pole.nazwa">
+        <source>Name</source>
+        <target>Nazwa</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.pole.stanowisko">
+        <source>Job title</source>
+        <target>Stanowisko</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.pole.email">
+        <source>E-mail address</source>
+        <target>Adres e-mail</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.pole.telefon">
+        <source>Phone number</source>
+        <target>Telefon</target>
+      </trans-unit>
+
+      <!-- Nazwa pola dokładanego do kontaktu sklepu. PrestaShop 9.2 wypala nazwy
+           pól dodatkowych do katalogu jako „klucz = klucz" już po wczytaniu tego
+           pliku, więc tego jednego wpisu nie użyje — natywny formularz kontaktu
+           pokazuje angielski napis do czasu przetłumaczenia go w panelu
+           tłumaczeń PrestaShopa. Wpis zostaje, bo po poprawce w PrestaShopie
+           zacznie działać sam. -->
+      <trans-unit id="quince.contacts.pole.telefon.natywne">
+        <source>Phone</source>
+        <target>Telefon</target>
+      </trans-unit>
+
+      <trans-unit id="quince.contacts.zdjecie">
+        <source>Photo</source>
+        <target>Zdjęcie</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.zdjecie.brak">
+        <source>No photo yet</source>
+        <target>Jeszcze bez zdjęcia</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.zdjecie.formaty">
+        <source>JPG, PNG, WEBP or AVIF, up to 2 MB.</source>
+        <target>JPG, PNG, WEBP albo AVIF, do 2 MB.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.zdjecie.wybierz">
+        <source>Choose a photo</source>
+        <target>Wybierz zdjęcie</target>
+      </trans-unit>
+
+      <trans-unit id="quince.contacts.kategorie">
+        <source>Shown in categories</source>
+        <target>Pokazuje się w kategoriach</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.kategorie.wskaz">
+        <source>Pick categories</source>
+        <target>Wskaż kategorie</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.kategorie.podkategorie">
+        <source>Subcategories count together with the category.</source>
+        <target>Podkategorie liczą się razem z kategorią.</target>
+      </trans-unit>
+
+      <trans-unit id="quince.contacts.dodaj.etykieta">
+        <source>Add a person to the list</source>
+        <target>Dodaj osobę do listy</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.dodaj.przycisk">
+        <source>Add</source>
+        <target>Dodaj</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.dodaj.wszyscy">
+        <source>All shop contacts are already on the list. A new person starts as a contact in the shop.</source>
+        <target>Wszystkie kontakty sklepu są już na liście. Nowa osoba zaczyna się od kontaktu w sklepie.</target>
+      </trans-unit>
+
+      <trans-unit id="quince.contacts.zapisano">
+        <source>Settings saved.</source>
+        <target>Ustawienia zapisane.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.dodano">
+        <source>Person added.</source>
+        <target>Osoba dodana.</target>
+      </trans-unit>
+
+    </body>
+  </file>
+</xliff>

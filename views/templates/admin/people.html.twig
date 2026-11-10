@@ -1,0 +1,332 @@
+{# Ekran modułu w stylistyce silnika: ten sam layout, te same makra pól.
+   Moduł nie ma własnego CSS-u ani własnego sidebara — bierze je stąd. #}
+{% extends '@Modules/quince_engine/views/templates/admin/layout.html.twig' %}
+{% import '@Modules/quince_engine/views/templates/admin/_macros/icons.html.twig' as icons %}
+{% import '@Modules/quince_engine/views/templates/admin/_macros/fields.html.twig' as fields %}
+
+{% trans_default_domain 'Modules.Quincecontacts.Admin' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('../modules/quince_engine/views/js/vendor/alpine-sort.min.js') ~ qcVer }}" defer></script>
+    <script src="{{ asset('../modules/quince_engine/views/js/vendor/alpine.min.js') ~ qcVer }}" defer></script>
+{% endblock %}
+
+{% block quince_intro %}
+    {# Nazwa, e-mail, telefon i stanowisko żyją w karcie kontaktu sklepu.
+       Ekran mówi to wprost, bo inaczej sprzedawca szuka ich tutaj. #}
+    <div class="qc-alert qc-alert-info">
+        {{ icons.icon('info', 18, 'qc-alert-icon') }}
+        <div>
+            {{ 'Add the contacts and specialists your customers can reach.'|trans }}
+            {% if contactsRoute %}
+                <a href="{{ contactsRoute }}">{{ 'Open the list of contacts'|trans }}</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block quince_actions %}
+    <button type="submit" form="quince-contacts" class="qc-btn qc-btn-primary">
+        {{ icons.icon('check', 14) }} {{ 'Save changes'|trans }}
+    </button>
+{% endblock %}
+
+{% block quince_body %}
+
+
+{# Dodanie osoby to osobny formularz: wybór kontaktu zapisuje się od razu,
+   żeby wiersz miał gdzie przyjąć zdjęcie i kategorie. #}
+<form id="quince-contacts-add" method="post" action="{{ path('quince_contacts_add') }}" hidden>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('quince_contacts_add') }}">
+</form>
+
+<form id="quince-contacts" method="post" action="{{ path('quince_contacts_save') }}"
+      enctype="multipart/form-data" class="qc-stack">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('quince_contacts_save') }}">
+
+    <div class="qc-card">
+        <div class="qc-card-head">
+            <div>
+                <div class="qc-card-title">{{ 'People in your shop'|trans }}</div>
+            </div>
+
+        </div>
+
+        <div class="qc-card-body">
+            {% if people is empty %}
+                <div class="qc-empty">
+                    <div class="qc-empty-text" style="padding:14px">
+                        {{ 'Nobody here yet.'|trans }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="qc-repeater" x-sort>
+                {% for osoba in people %}
+                    <div class="qc-rep-row" x-sort:item="{{ osoba.id_contact }}" :class="usuniety && 'is-removed'"
+                         x-data="quinceOsoba({{ osoba.categories|json_encode|raw }}, '{{ osoba.photoUrl }}', NAZWY_KATEGORII)">
+
+                        <div class="qc-rep-row-head">
+                            <span class="qc-rep-handle" x-sort:handle>{{ icons.icon('drag', 14) }}</span>
+
+                            <span class="qc-rep-thumb">
+                                {% if osoba.photoUrl %}
+                                    <img src="{{ osoba.photoUrl }}" alt="">
+                                {% else %}
+                                    {{ icons.icon('image', 16) }}
+                                {% endif %}
+                            </span>
+
+                            <span class="qc-rep-name">
+                                {{ osoba.name ?: osoba.email }}
+                                <span class="qc-rep-sub" x-text="podpisWiersza()"></span>
+                            </span>
+
+                            <div class="qc-rep-actions">
+                                {{ fields.toggle('person[' ~ osoba.id_contact ~ '][active]', osoba.active) }}
+
+                                <button type="button" class="qc-icon-btn" @click="open = !open">
+                                    <svg class="qc-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"
+                                         stroke="currentColor" stroke-width="2" aria-hidden="true"
+                                         :style="open && 'transform:rotate(180deg)'"><path d="m4 6 4 4 4-4"/></svg>
+                                </button>
+
+                                <button type="button" class="qc-icon-btn qc-danger" x-show="!usuniety"
+                                        @click="usuniety = true; open = false">
+                                    {{ icons.icon('trash', 14) }}
+                                </button>
+
+                                <button type="button" class="qc-icon-btn" x-show="usuniety" x-cloak
+                                        @click="usuniety = false">
+                                    {{ icons.icon('refresh', 14) }}
+                                </button>
+
+                                <template x-if="usuniety">
+                                    <input type="hidden" name="person[{{ osoba.id_contact }}][remove]" value="1">
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="qc-rep-body" x-show="open" x-cloak>
+                            <div class="qc-form-grid qc-form-grid-2">
+                                {{ fields.multilang(
+                                    'person[' ~ osoba.id_contact ~ '][name]',
+                                    'Name'|trans, languages, osoba.names
+                                ) }}
+
+                                {{ fields.multilang(
+                                    'person[' ~ osoba.id_contact ~ '][job_title]',
+                                    'Job title'|trans, languages, osoba.job_titles,
+                                    'Doradca techniczny'
+                                ) }}
+
+                                <div class="qc-field">
+                                    <label class="qc-label" for="q-email-{{ osoba.id_contact }}">{{ 'E-mail address'|trans }}</label>
+                                    <input type="email" class="qc-field-base qc-focusable"
+                                           id="q-email-{{ osoba.id_contact }}"
+                                           name="person[{{ osoba.id_contact }}][email]"
+                                           value="{{ osoba.email }}" spellcheck="false">
+                                </div>
+
+                                <div class="qc-field">
+                                    <label class="qc-label" for="q-phone-{{ osoba.id_contact }}">{{ 'Phone number'|trans }}</label>
+                                    <input type="text" class="qc-field-base qc-focusable"
+                                           id="q-phone-{{ osoba.id_contact }}"
+                                           name="person[{{ osoba.id_contact }}][phone]"
+                                           value="{{ osoba.phone }}" spellcheck="false">
+                                </div>
+                            </div>
+
+                            <div class="qc-form-grid qc-form-grid-2" style="margin-block-start:16px">
+                                <div class="qc-field">
+                                    <label class="qc-label">{{ 'Photo'|trans }}</label>
+
+                                    {# Pole pliku jest schowane, a klika się w przycisk: goły
+                                       `input type=file` w panelu nie wygląda na nic, na co
+                                       można kliknąć, i różni się w każdej przeglądarce. #}
+                                    <div class="qc-upload">
+                                        <span class="qc-upload-thumb">
+                                            <template x-if="podglad">
+                                                <img :src="podglad" alt="">
+                                            </template>
+                                            <template x-if="!podglad">
+                                                <span>{{ icons.icon('image', 18) }}</span>
+                                            </template>
+                                        </span>
+
+                                        <div class="qc-upload-info">
+                                            <div class="qc-upload-name" x-text="nazwaPliku || '{{ 'No photo yet'|trans }}'"></div>
+                                            <div>{{ 'JPG, PNG, WEBP or AVIF, up to 2 MB.'|trans }}</div>
+                                        </div>
+
+                                        <div class="qc-upload-actions">
+                                            <button type="button" class="qc-btn qc-btn-outline"
+                                                    @click="$refs.plik.click()">
+                                                {{ icons.icon('upload', 14) }} {{ 'Choose a photo'|trans }}
+                                            </button>
+                                        </div>
+
+                                        <input type="file" x-ref="plik" hidden
+                                               id="q-photo-{{ osoba.id_contact }}"
+                                               name="person[{{ osoba.id_contact }}][photo]"
+                                               accept="image/jpeg,image/png,image/webp,image/avif"
+                                               @change="wybierz($event)">
+                                    </div>
+                                </div>
+
+                                <div class="qc-field">
+                                    <label class="qc-label">{{ 'Shown in categories'|trans }}</label>
+
+                                    {# Pola wyboru niosą nazwę formularza i wysyłają się same,
+                                       także gdy menu jest zwinięte. Alpine trzyma listę tylko
+                                       po to, żeby na przycisku było widać, co zaznaczono. #}
+                                    <div class="qc-multipick" @click.outside="wyborOtwarty = false">
+                                        <button type="button"
+                                                class="qc-field-base qc-focusable qc-multipick-btn"
+                                                @click="wyborOtwarty = !wyborOtwarty">
+                                            <span class="qc-multipick-label"
+                                                  :class="!categories.length && 'qc-empty-label'"
+                                                  x-text="podpisWyboru()"></span>
+                                            {{ icons.icon('chevronDown', 14) }}
+                                        </button>
+
+                                        <div class="qc-multipick-menu" x-show="wyborOtwarty" x-cloak>
+                                            {% for kategoria in categories %}
+                                                <label class="qc-multipick-row"
+                                                       style="padding-inline-start: {{ 8 + kategoria.level * 16 }}px">
+                                                    <input type="checkbox" value="{{ kategoria.id }}"
+                                                           name="person[{{ osoba.id_contact }}][categories][]"
+                                                           x-model="categories">
+                                                    <span>{{ kategoria.name }}</span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="qc-hint">
+                                        {{ 'Subcategories count together with the category.'|trans }}
+                                    </div>
+                                </div>
+
+                                {# Osoba dla reszty sklepu. Kategorie mają pierwszeństwo:
+                                   ten przełącznik działa tam, gdzie nie przypisano nikogo. #}
+                                <div class="qc-field">
+                                    <label class="qc-label">{{ 'Rest of the shop'|trans }}</label>
+                                    {{ fields.toggle(
+                                        'person[' ~ osoba.id_contact ~ '][default]',
+                                        osoba.is_default,
+                                        'Answers where no one is assigned'|trans
+                                    ) }}
+                                    <div class="qc-hint">
+                                        {{ 'Only one person can take this. Products from categories without anybody assigned show them; without it those pages have no “Ask an expert” button.'|trans }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Dodawanie pod listą, nie nad nią: przy dwudziestu osobach przycisk
+               nad spisem każe przewijać w górę po każdym dodaniu. Pole i przycisk
+               stoją we wspólnej ramce z nagłówkiem, żeby było widać, że jedno
+               działa na drugim. #}
+            <div class="qc-field" style="margin-block-start:16px">
+                {% if available|length %}
+                    <label class="qc-label" for="q-add-contact">{{ 'Add a person to the list'|trans }}</label>
+
+                    <div style="display:flex; gap:8px">
+                        <div class="qc-select-wrap" style="flex:1; min-width:0">
+                            <select class="qc-field-base qc-select qc-focusable" id="q-add-contact"
+                                    name="id_contact" form="quince-contacts-add">
+                                {% for kontakt in available %}
+                                    <option value="{{ kontakt.id_contact }}">{{ kontakt.name ?: kontakt.email }}</option>
+                                {% endfor %}
+                            </select>
+                            {{ icons.icon('chevronDown', 14, 'qc-select-chevron') }}
+                        </div>
+                        <button type="submit" form="quince-contacts-add" class="qc-btn qc-btn-outline">
+                            {{ icons.icon('plus', 14) }} {{ 'Add'|trans }}
+                        </button>
+                    </div>
+
+                {% else %}
+                    <div class="qc-hint">
+                        {{ 'All shop contacts are already on the list. A new person starts as a contact in the shop.'|trans }}
+                        {% if contactsRoute %}<a href="{{ contactsRoute }}">{{ 'Open the list of contacts'|trans }}</a>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+/* Mapa budowana pętlą, nie filtrem `merge`: `merge` woła array_merge, a ten
+   przenumerowuje klucze liczbowe. Identyfikatory kategorii zamieniały się
+   wtedy w 0, 1, 2 i przycisk podpisywał się nazwami innych kategorii. */
+const NAZWY_KATEGORII = { {% for k in categories %}"{{ k.id }}": {{ k.name|json_encode|raw }}{{ loop.last ? '' : ',' }}{% endfor %} };
+
+/* Jeden wiersz listy: pola osoby, wybrane kategorie i podgląd zdjęcia. */
+function quinceOsoba(wybrane, zdjecie, nazwy) {
+    return {
+        open: false,
+        // `x-model` na polach wyboru operuje napisami, nie liczbami.
+        categories: wybrane.map(String),
+        wyborOtwarty: false,
+
+        /* Kosz nie kasuje od razu, tylko znaczy wiersz. Zdjęcie i przypisania
+           odchodzą dopiero przy zapisie, więc wyjście ze strony bez zapisania
+           cofa pomyłkę — tak samo jak przy blokach odnośników. */
+        usuniety: false,
+
+        /* Podpis pod nazwą: stan wiersza jest ważniejszy od liczby kategorii,
+           bo mówi, co się stanie po kliknięciu „Zapisz zmiany". */
+        podpisWiersza() {
+            if (this.usuniety) {
+                return {{ 'will disappear when you save'|trans|json_encode|raw }};
+            }
+
+            if (!this.categories.length) {
+                return {{ 'no categories yet'|trans|json_encode|raw }};
+            }
+
+            return this.podpisWyboru();
+        },
+
+        /* Na przycisku nazwy, nie liczba: „Opony, Filtry" mówi więcej niż „2".
+           Przy dłuższej liście reszta schodzi do „i 3 więcej", żeby przycisk
+           nie rozpychał wiersza. */
+        podpisWyboru() {
+            if (!this.categories.length) {
+                return {{ 'Pick categories'|trans|json_encode|raw }};
+            }
+
+            const wybraneNazwy = this.categories.map(id => nazwy[id] || id);
+
+            if (wybraneNazwy.length <= 3) {
+                return wybraneNazwy.join(', ');
+            }
+
+            return wybraneNazwy.slice(0, 3).join(', ') + ' + ' + (wybraneNazwy.length - 3);
+        },
+        nazwaPliku: '',
+        podglad: zdjecie || '',
+
+        /* Podgląd z pliku wybranego w przeglądarce — sprzedawca widzi, co wgrywa,
+           zanim zapisze, zamiast dowiadywać się tego po przeładowaniu strony. */
+        wybierz(e) {
+            const plik = e.target.files && e.target.files[0];
+
+            if (!plik) { return; }
+
+            this.nazwaPliku = plik.name;
+            this.podglad = URL.createObjectURL(plik);
+        },
+
+    };
+}
+</script>
+
+{% endblock %}

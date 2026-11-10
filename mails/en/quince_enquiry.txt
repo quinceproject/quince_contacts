@@ -1,0 +1,11 @@
+{shop_name} — a question about a product
+
+Hello {expert_name},
+
+{customer_name} ({customer_email}) asks about {product_name}:
+{product_url}
+
+{message}
+
+Reply to this message and the answer goes straight to the customer.
+{shop_url}
