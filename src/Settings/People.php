@@ -22,10 +22,8 @@ use DbQuery;
  * to, czego ten mechanizm nie obsłuży: zdjęcie, kolejność, przypisanie do
  * kategorii i stanowisko.
  *
- * Stanowisko jest u nas nie z wyboru. Pole językowe zgłoszone przez mechanizm
- * dodatkowych pól rozwala w PrestaShopie 9.2 i listę kontaktów, i zapis karty
- * kontaktu. Wróci tam, kiedy błąd zostanie naprawiony — kształt tej tabeli
- * jest wtedy do wyrzucenia bez ruszania reszty.
+ * Stanowisko leży tutaj, bo pole językowe zgłoszone przez mechanizm dodatkowych
+ * pól rozwala w PrestaShopie 9.2 i listę kontaktów, i zapis karty kontaktu.
  *
  * Konsekwencja: wiersz w tej tabeli nie opisuje osoby, tylko mówi „ten kontakt
  * sklepu pokazuje się klientom jako osoba".
@@ -212,7 +210,7 @@ final class People
         return (bool) $ok;
     }
 
-    /** Zdjęcie osoby — sama nazwa pliku, bez ścieżki. */
+    /** Zdjęcie osoby: sama nazwa pliku, bez ścieżki. */
     public function photo(int $idContact): string
     {
         return (string) Db::getInstance()->getValue(
@@ -254,7 +252,7 @@ final class People
             return [];
         }
 
-        // Ścieżka od korzenia do wskazanej kategorii — `nleft`/`nright` opisują
+        // Ścieżka od korzenia do wskazanej kategorii. `nleft`/`nright` opisują
         // zagnieżdżenie, więc przodkowie to te, które ją obejmują.
         $przodkowie = Db::getInstance()->executeS(
             'SELECT rodzic.id_category
@@ -390,7 +388,7 @@ final class People
     }
 
     /**
-     * Kategorie sklepu do przypisania osobie — płaska lista z poziomem zagnieżdżenia.
+     * Kategorie sklepu do przypisania osobie: płaska lista z poziomem zagnieżdżenia.
      *
      * @return array<int,array{id:int,name:string,level:int}>
      */
@@ -401,8 +399,7 @@ final class People
 
         // Złączenie po języku ORAZ po sklepie. `category_lang` ma wiersz na każdą
         // parę język–sklep, więc samo `id_lang` daje tyle kopii każdej kategorii,
-        // ile sklep ma sklepów — na instalacji z czterema sklepami lista pokazywała
-        // „Clothes" cztery razy pod rząd.
+        // ile jest sklepów.
         $wiersze = Db::getInstance()->executeS(
             'SELECT c.id_category, cl.name, c.level_depth FROM `' . _DB_PREFIX_ . 'category` c'
             . ' JOIN `' . _DB_PREFIX_ . 'category_lang` cl ON cl.id_category = c.id_category'

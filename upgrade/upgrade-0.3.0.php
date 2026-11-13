@@ -18,7 +18,7 @@ if (!defined('_PS_VERSION_')) {
  *
  * Moduł pokazywał ludzi wyłącznie w panelu; teraz dokłada przy produkcie kartę
  * osoby z jego działu i formularz zapytania. Sklep, który ma moduł już
- * zainstalowany, dostaje tu brakującą rejestrację hooka — instalator zapisuje
+ * zainstalowany, dostaje tu brakującą rejestrację hooka, bo instalator zapisuje
  * ją tylko przy pierwszej instalacji.
  *
  * @param Module $module

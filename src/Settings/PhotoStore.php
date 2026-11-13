@@ -92,7 +92,7 @@ final class PhotoStore
         // w pamięci podręcznej i bez zmiany nazwy pokazywałaby je po podmianie.
         $nazwa = $idContact . '-' . uniqid('', false) . '.' . $rozszerzenie;
 
-        // Plik nie trafia na dysk taki, jaki przyszedł — zostaje przepisany
+        // Plik nie trafia na dysk taki, jaki przyszedł, tylko zostaje przepisany
         // piksel po pikselu. Wszystko, co ktoś doczepił do obrazu poza samym
         // obrazem, ginie po drodze.
         if (!ImageManager::resize($plik->getPathname(), $this->dir() . $nazwa, null, null, $rozszerzenie)) {
@@ -120,7 +120,7 @@ final class PhotoStore
      * Sprzątanie po odinstalowaniu modułu.
      *
      * Zdjęcia bez wierszy w bazie to pliki, których nikt już nie odnajdzie ani
-     * nie skasuje z panelu — zostałyby na dysku na zawsze.
+     * nie skasuje z panelu. Zostałyby na dysku na zawsze.
      */
     public function purge(): void
     {

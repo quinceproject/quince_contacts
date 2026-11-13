@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Osoby pokazywane klientom.
  *
  * Ekran obsługuje komplet: nazwę, adres e-mail, telefon, stanowisko, zdjęcie
- * i kategorie. Dane nie są jednak zdublowane — każde pole zapisuje się tam,
+ * i kategorie. Dane nie są jednak zdublowane: każde pole zapisuje się tam,
  * gdzie mieszka: nazwa i e-mail w kontakcie sklepu, telefon jako dodatkowe pole
  * tej encji, stanowisko, zdjęcie i kategorie u nas. Karta kontaktu
  * w PrestaShopie zostaje drugimi drzwiami do tych samych danych.
@@ -92,7 +92,7 @@ class PeopleController extends QuinceController
      *
      * Ekran jest jednym formularzem, więc zapis też: zdjęcia, kategorie,
      * widoczność i kolejność przychodzą razem. Kolejność bierzemy z kolejności
-     * pól w formularzu — przeciągnięcie wiersza zmienia ją bez osobnego pola.
+     * pól w formularzu, więc przeciągnięcie wiersza zmienia ją bez osobnego pola.
      */
     public function saveAction(Request $request): RedirectResponse
     {
@@ -160,7 +160,7 @@ class PeopleController extends QuinceController
      * razy. Sprawdzamy stan po zapisie, a nie w chwili kliknięcia: przeniesienie
      * roli na kogoś innego to jedno zaznaczenie i jedno odznaczenie w tym samym
      * formularzu i ma się udać bez ostrzeżenia. Dopiero dwa włączone naraz są
-     * błędem — wtedy nie ruszamy niczego i mówimy, kogo dotyczy.
+     * błędem. Wtedy nie ruszamy niczego i mówimy, kogo dotyczy.
      *
      * Wiersz oznaczony koszem się nie liczy: właśnie znika.
      *
@@ -197,7 +197,7 @@ class PeopleController extends QuinceController
     }
 
     /**
-     * Nazwa i adres e-mail idą tam, gdzie mieszkają — do kontaktu sklepu.
+     * Nazwa i adres e-mail idą tam, gdzie mieszkają: do kontaktu sklepu.
      *
      * @param array<string,mixed> $wiersz
      */
@@ -264,7 +264,7 @@ class PeopleController extends QuinceController
     /**
      * Telefon zapisujemy mechanizmem PrestaShopa, nie prosto do kolumny.
      *
-     * Nazwa kolumny zależy od modułu i wersji, a mechanizm zna ją sam — dzięki
+     * Nazwa kolumny zależy od modułu i wersji, a mechanizm zna ją sam. Dzięki
      * temu ta sama wartość wraca potem w natywnej karcie kontaktu i w API.
      */
     private function savePhone(int $idContact, string $phone): void
@@ -279,7 +279,7 @@ class PeopleController extends QuinceController
     }
 
     /**
-     * Adres listy kontaktów sklepu — ekran odsyła tam po dane, których sam
+     * Adres listy kontaktów sklepu. Ekran odsyła tam po dane, których sam
      * nie zmienia.
      */
     private function contactsRoute(): string

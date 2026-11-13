@@ -1,5 +1,5 @@
 {**
- * Quince Contacts — „Zapytaj specjalistę" na karcie produktu.
+ * Quince Contacts: „Zapytaj specjalistę" na karcie produktu.
  *
  * Przycisk stoi obok „Pobierz ofertę", a szuflada pokazuje człowieka: zdjęcie,
  * imię, stanowisko, telefon i adres. Formularz jest pod nimi, bo klient najpierw
@@ -119,7 +119,7 @@
       </div>
 
       {* Po wysłaniu formularz znika, zostaje potwierdzenie z imieniem osoby,
-         która odpowie — to ona, a nie ogólna skrzynka, jest tu obietnicą. *}
+         która odpowie. *}
       <div class="q-expert__done" data-q-expert-done hidden>
         <svg class="q-expert__done-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>

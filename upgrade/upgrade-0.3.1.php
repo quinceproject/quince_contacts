@@ -20,7 +20,7 @@ use PrestaShop\PrestaShop\Core\ExtraProperty\Definition\ExtraPropertyType;
 /**
  * 0.3.1: telefon faktycznie w Admin API.
  *
- * `associatedApis` miało od instalacji wartość `['contact']` — nazwę encji,
+ * `associatedApis` miało od instalacji wartość `['contact']`, czyli nazwę encji,
  * nie szablon trasy. Natywny most z extra properties do API rozpoznaje tylko
  * prawdziwe `uriTemplate` (`/contacts`, `/contacts/{contactId}`), więc pole
  * nigdy nie wychodziło w odpowiedzi, mimo że miało. `registerExtraProperty()`

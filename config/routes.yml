@@ -1,8 +1,7 @@
 # Ekran osób pokazywanych klientom.
 #
-# `_legacy_controller` wskazuje zakładkę silnika, bo moduł bez niego nie działa —
-# nie zakładamy własnej zakładki tylko po to, żeby PrestaShop miał gdzie sprawdzić
-# uprawnienia.
+# `_legacy_controller` wskazuje zakładkę silnika, bo moduł bez niego nie działa.
+# Uprawnienia PrestaShop sprawdza więc na zakładce silnika.
 quince_contacts:
   path: quince/contacts
   methods: [GET]

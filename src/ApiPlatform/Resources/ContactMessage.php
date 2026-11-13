@@ -21,8 +21,8 @@ use Quince\Contacts\ApiPlatform\Provider\ContactMessageProvider;
  * Zapytanie do specjalisty, złożone z karty produktu, w Admin API.
  *
  * Tylko do odczytu: zapis idzie wyłącznie przez formularz sklepu. Wiadomość
- * i tak wychodzi mailem i zdarzeniem `contact.enquiry` od razu po złożeniu —
- * ten zasób jest dla odbiorcy, który woli cyklicznie odpytywać, niż odbierać
+ * i tak wychodzi mailem i zdarzeniem `contact.enquiry` od razu po złożeniu.
+ * Ten zasób jest dla odbiorcy, który woli cyklicznie odpytywać, niż odbierać
  * webhook.
  */
 #[ApiResource(
@@ -55,7 +55,7 @@ class ContactMessage
 
     public int $contactId = 0;
 
-    /** Imię i adres eksperta w chwili wysyłki — nie dociągane z kontaktu na żywo. */
+    /** Imię i adres eksperta w chwili wysyłki, nie dociągane z kontaktu na żywo. */
     public string $expertName = '';
 
     public string $expertEmail = '';

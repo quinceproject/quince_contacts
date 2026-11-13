@@ -23,18 +23,15 @@ use Quince\Contacts\Settings\People;
 use Quince\Contacts\Settings\PhotoStore;
 
 /**
- * Quince Contacts — ludzie zamiast adresu skrzynki.
- *
- * Klient, który widzi twarz, imię i stanowisko doradcy, pyta chętniej niż ten,
- * który widzi formularz „napisz do nas". Moduł pokazuje takie osoby tam, gdzie
- * pytanie się rodzi — przy produkcie z ich działu.
+ * Quince Contacts: osoby ze zdjęciem, stanowiskiem i telefonem przy produktach
+ * z ich działu.
  *
  * Kartoteką ludzi jest sam PrestaShop: osoba to kontakt sklepu z Sklep →
  * Kontakty. Instalator dokłada tej encji telefon przez mechanizm dodatkowych
  * pól z 9.2, więc numer widać też w natywnym formularzu, na liście kontaktów
- * i w Admin API. Reszta — zdjęcie, stanowisko, kolejność i przypisanie do
- * kategorii — leży u nas, bo tego mechanizm nie obsłuży (albo, jak przy
- * stanowisku, obsługuje wadliwie; opis przy `addContactFields()`).
+ * i w Admin API. Reszta (zdjęcie, stanowisko, kolejność i przypisanie do
+ * kategorii) leży w tabelach modułu, bo tego mechanizm nie obsłuży (albo, jak
+ * przy stanowisku, obsługuje wadliwie; opis przy `addContactFields()`).
  *
  * Ekran „Kontakty" w panelu wypełnia komplet z jednego miejsca. Nie jest to
  * drugi zestaw danych: nazwa i adres e-mail zapisują się prosto do kontaktu
@@ -127,19 +124,18 @@ class Quince_Contacts extends Module
      * Telefon dokładany do encji kontaktu.
      *
      * Pole wchodzi w natywny formularz kontaktu, na listę kontaktów i do Admin
-     * API — sklep dostaje je w miejscu, w którym już pracuje, a system zewnętrzny
-     * czyta je bez naszego udziału.
+     * API, więc system zewnętrzny czyta je bez udziału modułu.
      *
      * Napis „Phone" zostaje po angielsku w natywnym formularzu i na liście
      * kontaktów. PrestaShop 9.2 dokłada nazwy pól dodatkowych do katalogu
      * tłumaczeń jako „klucz = klucz" po wczytaniu plików modułu, więc nadpisuje
      * nasz przekład tego samego napisu; przetłumaczyć da się go w panelu
      * tłumaczeń PrestaShopa. Dlatego własny ekran opisuje to pole innym
-     * napisem — inaczej straciłby polską nazwę razem z nim.
+     * napisem, inaczej straciłby polską nazwę razem z nim.
      *
-     * Stanowiska tą drogą nie dokładamy, choć pasowałoby tu tak samo.
+     * Stanowiska tą drogą nie dokładamy.
      * PrestaShop 9.2 beta nie potrafi zapisać pola **językowego** na encji, której
-     * tabela językowa nie ma `id_shop` — `ExtraPropertyWriter::writeLang()` buduje
+     * tabela językowa nie ma `id_shop`: `ExtraPropertyWriter::writeLang()` buduje
      * zapis z tym kluczem bezwarunkowo, a `contact_lang` takiej kolumny nie ma.
      * Próba zapisania kończy się błędem SQL i stroną błędu zamiast zapisu. To samo
      * psuje listę kontaktów, gdy takie pole zgłosi się na siatkę. Stanowisko
@@ -183,7 +179,7 @@ class Quince_Contacts extends Module
     /**
      * Zdjęcie pola stanowiska z instalacji sprzed 0.2.0.
      *
-     * Kasujemy razem z danymi, bo danych i tak nie ma — zapis nigdy się nie udał.
+     * Kasujemy razem z danymi, bo danych i tak nie ma: zapis nigdy się nie udał.
      */
     public function removeJobTitleField(): void
     {
@@ -254,7 +250,7 @@ class Quince_Contacts extends Module
      * Skasowany kontakt sklepu zabiera swoją osobę.
      *
      * Bez tego zostaje osoba-widmo: zdjęcie i kategorie wskazujące na kontakt,
-     * którego już nie ma — a więc bez nazwy, bez adresu i bez sposobu, żeby ją
+     * którego już nie ma, a więc bez nazwy, bez adresu i bez sposobu, żeby ją
      * z panelu poprawić.
      *
      * @param array{object?:object} $params

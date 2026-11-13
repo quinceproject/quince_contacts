@@ -21,7 +21,7 @@ use Quince\Contacts\Settings\People;
  *
  * Formularza nie sprawdzamy tutaj poza tym, co dotyczy samej treści. Znacznik
  * strony, pułapkę, czas wypełnienia i limit powtórzeń bierze na siebie strażnik
- * silnika — odpala się na `actionFrontControllerInitAfter` dla każdego żądania
+ * silnika. Odpala się na `actionFrontControllerInitAfter` dla każdego żądania
  * niosącego jego pola i przerywa, zanim ten kod się zacznie.
  *
  * Wiadomość idzie trzema drogami naraz i to jest celowe: mailem do osoby, żeby
@@ -152,8 +152,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      * Zdarzenie wychodzące ze sklepu.
      *
      * Odbiorcę wskazuje sklep w module `quince_events`, w jego ekranie
-     * ustawień — moduł nie zna ani adresu, ani tego, co stoi po drugiej
-     * stronie. Bez ustawionego odbiorcy nie dzieje się nic, a wiadomość
+     * ustawień. Ten moduł nie zna adresu odbiorcy. Bez ustawionego odbiorcy nie dzieje się nic, a wiadomość
      * i tak poszła mailem.
      *
      * @param array<string,mixed> $osoba
@@ -171,7 +170,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
                 type: 'contact.enquiry',
                 data: [
                     'sender' => [
-                        // Zero znaczy gość. Sklep nie zgaduje, kto to jest —
+                        // Zero znaczy gość. Sklep nie zgaduje, kto to jest:
                         // dopasowaniem do kontaktu zajmuje się odbiorca.
                         'id_customer' => (int) ($this->context->customer->id ?? 0) > 0
                             && $this->context->customer->isLogged()

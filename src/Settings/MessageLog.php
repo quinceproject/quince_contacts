@@ -17,11 +17,11 @@ use DbQuery;
 /**
  * Log zapytań do specjalisty, do odczytu przez Admin API.
  *
- * Wiadomość idzie mailem i zdarzeniem `contact.enquiry` od razu — to jest
+ * Wiadomość idzie mailem i zdarzeniem `contact.enquiry` od razu. To jest
  * push, nikną po doręczeniu albo po wyczerpaniu prób. Ten log jest osobnym,
  * trwałym zapisem pod odpytywanie: CEP woła go cyklicznie i pyta o wiersze
  * nowsze niż ostatnio widziany `id`, więc nic nie trzeba tu oznaczać jako
- * „odebrane" — to CEP pamięta, gdzie skończył.
+ * „odebrane". To CEP pamięta, gdzie skończył.
  *
  * Nazwa eksperta i adres idą zapisane w chwili wysyłki, nie dociągane z
  * kontaktu na żywo: kontakt mógł się od tamtej pory zmienić albo zniknąć,
@@ -102,7 +102,7 @@ final class MessageLog
     }
 
     /**
-     * Wiadomości nowsze niż `$sinceId`, od najstarszej do najnowszej — tak,
+     * Wiadomości nowsze niż `$sinceId`, od najstarszej do najnowszej, tak,
      * żeby `id` ostatniego wiersza na stronie było `sinceId` następnego wołania.
      *
      * @return array<int,array<string,mixed>>

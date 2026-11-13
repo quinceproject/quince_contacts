@@ -16,7 +16,7 @@ if (!defined('_PS_VERSION_')) {
 use Quince\Contacts\Settings\People;
 
 /**
- * 0.2.0 — stanowisko schodzi z pola PrestaShopa do naszej tabeli.
+ * 0.2.0: stanowisko schodzi z pola PrestaShopa do tabeli modułu.
  *
  * PrestaShop 9.2 beta nie potrafi zapisać pola językowego na encji, której
  * tabela językowa nie ma `id_shop`; kontakt takiej kolumny nie ma, więc próba

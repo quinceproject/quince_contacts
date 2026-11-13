@@ -1,5 +1,5 @@
 {# Ekran modułu w stylistyce silnika: ten sam layout, te same makra pól.
-   Moduł nie ma własnego CSS-u ani własnego sidebara — bierze je stąd. #}
+   Moduł nie ma własnego CSS-u ani własnego sidebara, bierze je stąd. #}
 {% extends '@Modules/quince_engine/views/templates/admin/layout.html.twig' %}
 {% import '@Modules/quince_engine/views/templates/admin/_macros/icons.html.twig' as icons %}
 {% import '@Modules/quince_engine/views/templates/admin/_macros/fields.html.twig' as fields %}
@@ -278,7 +278,7 @@ function quinceOsoba(wybrane, zdjecie, nazwy) {
 
         /* Kosz nie kasuje od razu, tylko znaczy wiersz. Zdjęcie i przypisania
            odchodzą dopiero przy zapisie, więc wyjście ze strony bez zapisania
-           cofa pomyłkę — tak samo jak przy blokach odnośników. */
+           cofa pomyłkę. */
         usuniety: false,
 
         /* Podpis pod nazwą: stan wiersza jest ważniejszy od liczby kategorii,
@@ -314,8 +314,7 @@ function quinceOsoba(wybrane, zdjecie, nazwy) {
         nazwaPliku: '',
         podglad: zdjecie || '',
 
-        /* Podgląd z pliku wybranego w przeglądarce — sprzedawca widzi, co wgrywa,
-           zanim zapisze, zamiast dowiadywać się tego po przeładowaniu strony. */
+        /* Podgląd z pliku wybranego w przeglądarce, przed zapisem. */
         wybierz(e) {
             const plik = e.target.files && e.target.files[0];
 
