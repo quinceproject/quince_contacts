@@ -1,13 +1,14 @@
 # Ekran osób pokazywanych klientom.
 #
-# `_legacy_controller` wskazuje zakładkę silnika, bo moduł bez niego nie działa.
-# Uprawnienia PrestaShop sprawdza więc na zakładce silnika.
+# `_legacy_controller` wskazuje własną zakładkę modułu (`AdminQuinceContacts`).
+# Do niej odnoszą się uprawnienia pracownika: atrybuty `#[AdminSecurity]`
+# w kontrolerach sprawdzają prawa do tej zakładki.
 quince_contacts:
   path: quince/contacts
   methods: [GET]
   defaults:
     _controller: Quince\Contacts\Controller\Admin\PeopleController::indexAction
-    _legacy_controller: 'AdminQuince'
+    _legacy_controller: 'AdminQuinceContacts'
     _legacy_link: 'AdminQuince'
 
 quince_contacts_add:
@@ -15,7 +16,7 @@ quince_contacts_add:
   methods: [POST]
   defaults:
     _controller: Quince\Contacts\Controller\Admin\PeopleController::addAction
-    _legacy_controller: 'AdminQuince'
+    _legacy_controller: 'AdminQuinceContacts'
     _legacy_link: 'AdminQuince:save'
 
 quince_contacts_save:
@@ -23,5 +24,5 @@ quince_contacts_save:
   methods: [POST]
   defaults:
     _controller: Quince\Contacts\Controller\Admin\PeopleController::saveAction
-    _legacy_controller: 'AdminQuince'
+    _legacy_controller: 'AdminQuinceContacts'
     _legacy_link: 'AdminQuince:save'

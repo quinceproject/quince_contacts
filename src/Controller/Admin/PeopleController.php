@@ -14,6 +14,7 @@ namespace Quince\Contacts\Controller\Admin;
 use PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint;
 use PrestaShop\PrestaShop\Core\ExtraProperty\Value\ExtraPropertyReaderInterface;
 use PrestaShop\PrestaShop\Core\ExtraProperty\Value\ExtraPropertyWriterInterface;
+use PrestaShopBundle\Security\Attribute\AdminSecurity;
 use Quince\Contacts\Settings\People;
 use Quince\Contacts\Settings\PhotoStore;
 use Quince\Engine\Controller\Admin\QuinceController;
@@ -40,6 +41,7 @@ class PeopleController extends QuinceController
     ) {
     }
 
+    #[AdminSecurity("is_granted('read', request.get('_legacy_controller'))", message: 'You do not have permission to view this.')]
     public function indexAction(): Response
     {
         $idLang = (int) $this->getContext()->language->id;
@@ -70,6 +72,7 @@ class PeopleController extends QuinceController
     }
 
     /** Dołożenie kontaktu sklepu do listy osób. */
+    #[AdminSecurity("is_granted('create', request.get('_legacy_controller'))", message: 'You do not have permission to add this.')]
     public function addAction(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('quince_contacts_add', $request->request->get('_csrf_token'))) {
@@ -94,6 +97,7 @@ class PeopleController extends QuinceController
      * widoczność i kolejność przychodzą razem. Kolejność bierzemy z kolejności
      * pól w formularzu, więc przeciągnięcie wiersza zmienia ją bez osobnego pola.
      */
+    #[AdminSecurity("is_granted('update', request.get('_legacy_controller'))", message: 'You do not have permission to change this.')]
     public function saveAction(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('quince_contacts_save', $request->request->get('_csrf_token'))) {
