@@ -4,6 +4,15 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.7] - 2026-11-15
+
+### Fixed
+
+- A message to the product expert can be sent only about a product the customer can
+  see in the shop. A disabled product or one with visibility set to "Nowhere" is
+  refused. A product that is visible but not available for order still accepts
+  messages.
+
 ## [0.4.6] - 2026-11-15
 
 ### Security
