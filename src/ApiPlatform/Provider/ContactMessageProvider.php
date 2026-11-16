@@ -87,6 +87,7 @@ final class ContactMessageProvider implements ProviderInterface
         $wynik->customerId = (int) $row['id_customer'];
         $wynik->customerName = (string) $row['customer_name'];
         $wynik->customerEmail = (string) $row['customer_email'];
+        $wynik->customerPhone = (string) ($row['customer_phone'] ?? '');
         $wynik->message = (string) $row['message'];
         $wynik->mailSent = (bool) $row['mail_sent'];
         $wynik->createdAt = str_replace(' ', 'T', (string) $row['date_add']);

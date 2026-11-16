@@ -13,6 +13,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Quince\Contacts\Settings\FormSettings;
 use Quince\Contacts\Settings\MessageLog;
 use Quince\Contacts\Settings\People;
 
@@ -50,12 +51,22 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
     /** @return array<string,mixed> */
     private function wyslij(): array
     {
+        $pola = (new FormSettings())->fields();
+
         $email = trim((string) Tools::getValue('email'));
         $tresc = trim((string) Tools::getValue('message'));
-        $imie = trim((string) Tools::getValue('name'));
+        // Pole schowane w ustawieniach nie bierze udziału, nawet gdy ktoś je dośle.
+        $imie = $pola['name']['show'] ? mb_substr(trim((string) Tools::getValue('name')), 0, 128) : '';
+        $telefon = $pola['phone']['show'] ? mb_substr(trim((string) Tools::getValue('phone')), 0, 64) : '';
         $idProduct = (int) Tools::getValue('id_product');
 
         if ($email === '' || !Validate::isEmail($email) || $tresc === '') {
+            return ['ok' => false, 'error' => 'form'];
+        }
+
+        if (($pola['name']['required'] && $imie === '')
+            || ($pola['phone']['required'] && $telefon === '')
+            || ($telefon !== '' && !Validate::isPhoneNumber($telefon))) {
             return ['ok' => false, 'error' => 'form'];
         }
 
@@ -76,11 +87,75 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
             return ['ok' => false, 'error' => 'expert'];
         }
 
-        $wyslany = $this->mail($osoba, $email, $imie, $tresc, $produkt);
-        $this->zdarzenie($osoba, $email, $imie, $tresc, $produkt);
-        $this->zapisz($osoba, $email, $imie, $tresc, $produkt, $wyslany);
+        $wyslany = $this->mail($osoba, $email, $imie, $telefon, $tresc, $produkt);
+        $this->zdarzenie($osoba, $email, $imie, $telefon, $tresc, $produkt);
+        $this->zapisz($osoba, $email, $imie, $telefon, $tresc, $produkt, $wyslany);
+        $this->potwierdzenie($osoba, $email, $imie, $telefon, $tresc, $produkt);
 
         return ['ok' => true, 'mail' => $wyslany, 'expert' => $osoba['name']];
+    }
+
+    /**
+     * Potwierdzenie dla klienta, gdy sklep je włączył.
+     *
+     * W języku, w którym klient przegląda sklep; pusta treść w tym języku daje
+     * treść w języku domyślnym sklepu. Kopia do osoby, do której klient napisał,
+     * idzie jako ukryta kopia, a odpowiedź klienta trafia wprost do niej.
+     *
+     * @param array<string,mixed> $osoba
+     */
+    private function potwierdzenie(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt): void
+    {
+        $ustawienia = new FormSettings();
+
+        if (!$ustawienia->confirmEnabled()) {
+            return;
+        }
+
+        $idLang = (int) $this->context->language->id;
+        $dane = [
+            'name' => $imie,
+            'email' => $email,
+            'phone' => $telefon,
+            'message' => $tresc,
+            'product_name' => (string) $produkt->name,
+            'shop_name' => (string) Configuration::get('PS_SHOP_NAME'),
+        ];
+
+        $szablon = $ustawienia->bodyFor($idLang);
+
+        if (trim($szablon) === '') {
+            return;
+        }
+
+        $html = $ustawienia->render($szablon, $dane);
+        $temat = $ustawienia->renderSubject($ustawienia->subjectFor($idLang), $dane);
+        $kopia = $ustawienia->copyEnabled() && Validate::isEmail((string) $osoba['email'])
+            ? (string) $osoba['email']
+            : null;
+
+        Mail::Send(
+            $this->jezykSzablonu($idLang, 'quince_confirmation'),
+            'quince_confirmation',
+            $temat !== '' ? $temat : $dane['shop_name'],
+            [
+                // Treść jest już złożona i escapowana w FormSettings::render().
+                '{content}' => $html,
+                '{content_text}' => trim(html_entity_decode(strip_tags(str_replace(['<br>', '<br />', '</p>'], "\n", $html)), ENT_QUOTES, 'UTF-8')),
+            ],
+            $email,
+            $imie !== '' ? $imie : null,
+            null,
+            null,
+            null,
+            null,
+            _PS_MODULE_DIR_ . 'quince_contacts/mails/',
+            false,
+            (int) $this->context->shop->id,
+            $kopia,
+            (string) $osoba['email'],
+            (string) $osoba['name']
+        );
     }
 
     /**
@@ -92,7 +167,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      *
      * @param array<string,mixed> $osoba
      */
-    private function mail(array $osoba, string $email, string $imie, string $tresc, Product $produkt): bool
+    private function mail(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt): bool
     {
         $nazwaSklepu = (string) Configuration::get('PS_SHOP_NAME');
 
@@ -107,6 +182,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
                 // wpisuje odwiedzający: bez tego wstawiłby do maila własny odnośnik.
                 '{customer_name}' => htmlspecialchars($imie, ENT_QUOTES, 'UTF-8'),
                 '{customer_email}' => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
+                '{customer_phone}' => htmlspecialchars($telefon !== '' ? $telefon : '-', ENT_QUOTES, 'UTF-8'),
                 '{message}' => nl2br(htmlspecialchars($tresc, ENT_QUOTES, 'UTF-8')),
                 '{product_name}' => (string) $produkt->name,
                 '{product_url}' => $this->context->link->getProductLink($produkt),
@@ -162,7 +238,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      *
      * @param array<string,mixed> $osoba
      */
-    private function zdarzenie(array $osoba, string $email, string $imie, string $tresc, Product $produkt): void
+    private function zdarzenie(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt): void
     {
         $zdarzenia = Module::getInstanceByName('quince_events');
 
@@ -183,6 +259,8 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
                                 : 0,
                         'email' => $email,
                         'name' => $imie,
+                        // Pusty, gdy klient go nie podał albo sklep schował pole.
+                        'phone' => $telefon,
                     ],
                     'message' => $tresc,
                     'expert' => [
@@ -209,7 +287,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      *
      * @param array<string,mixed> $osoba
      */
-    private function zapisz(array $osoba, string $email, string $imie, string $tresc, Product $produkt, bool $wyslany): void
+    private function zapisz(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt, bool $wyslany): void
     {
         $idCustomer = (int) ($this->context->customer->id ?? 0) > 0 && $this->context->customer->isLogged()
             ? (int) $this->context->customer->id
@@ -224,7 +302,8 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
             $imie,
             $email,
             $tresc,
-            $wyslany
+            $wyslany,
+            $telefon
         );
     }
 }

@@ -47,7 +47,7 @@ class Quince_Contacts extends Module
     {
         $this->name = 'quince_contacts';
         $this->tab = 'front_office_features';
-        $this->version = '0.4.8';
+        $this->version = '0.5.0';
         $this->author = 'Quince Project';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '9.2.0', 'max' => '9.99.99'];
@@ -114,6 +114,11 @@ class Quince_Contacts extends Module
         $this->removeContactFields(false);
 
         (new PhotoStore())->purge();
+
+        // Ustawienia formularza i potwierdzenia: po nazwach, nigdy maską.
+        foreach (\Quince\Contacts\Settings\FormSettings::configurationKeys() as $klucz) {
+            Configuration::deleteByName($klucz);
+        }
 
         return (new People())->dropTables()
             && (new MessageLog())->dropTable()
@@ -236,6 +241,8 @@ class Quince_Contacts extends Module
             'quinceExpert' => $osoba,
             'quinceExpertPhoto' => (new PhotoStore())->url($osoba['photo']),
             'quinceExpertProduct' => (int) ($produkt['id_product'] ?? 0),
+            // Które pola formularza pokazać i które są obowiązkowe (ekran Kontakty).
+            'quinceExpertFields' => (new \Quince\Contacts\Settings\FormSettings())->fields(),
             'quinceExpertUrl' => $this->context->link->getModuleLink(
                 'quince_contacts',
                 'message',

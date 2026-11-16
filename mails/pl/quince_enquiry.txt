@@ -4,6 +4,7 @@ Dzień dobry {expert_name},
 
 {customer_name} ({customer_email}) pyta o {product_name}:
 {product_url}
+Telefon: {customer_phone}
 
 {message}
 

@@ -49,12 +49,33 @@ final class MessageLog
                 `id_customer` INT(11) UNSIGNED NOT NULL DEFAULT 0,
                 `customer_name` VARCHAR(128) NOT NULL DEFAULT "",
                 `customer_email` VARCHAR(255) NOT NULL DEFAULT "",
+                `customer_phone` VARCHAR(64) NOT NULL DEFAULT "",
                 `message` TEXT NOT NULL,
                 `mail_sent` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
                 `date_add` DATETIME NOT NULL,
                 PRIMARY KEY (`id_quince_contact_message`),
                 INDEX `idx_do_odpytania` (`id_shop`, `id_quince_contact_message`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8mb4'
+        );
+    }
+
+    /**
+     * Kolumna telefonu w tabeli założonej przed 0.5.0. Sprawdzamy, czy jej nie ma,
+     * bo `ADD COLUMN` na istniejącej kolumnie kończy się błędem.
+     */
+    public function addPhoneColumn(): bool
+    {
+        $jest = Db::getInstance()->executeS(
+            'SHOW COLUMNS FROM `' . _DB_PREFIX_ . self::TABLE . '` LIKE "customer_phone"'
+        );
+
+        if (!empty($jest)) {
+            return true;
+        }
+
+        return (bool) Db::getInstance()->execute(
+            'ALTER TABLE `' . _DB_PREFIX_ . self::TABLE . '`
+             ADD COLUMN `customer_phone` VARCHAR(64) NOT NULL DEFAULT "" AFTER `customer_email`'
         );
     }
 
@@ -73,7 +94,8 @@ final class MessageLog
         string $customerName,
         string $customerEmail,
         string $message,
-        bool $mailSent
+        bool $mailSent,
+        string $customerPhone = ''
     ): bool {
         return Db::getInstance()->insert(self::TABLE, [
             'id_shop' => $idShop,
@@ -85,6 +107,7 @@ final class MessageLog
             'id_customer' => $idCustomer,
             'customer_name' => pSQL($customerName),
             'customer_email' => pSQL($customerEmail),
+            'customer_phone' => pSQL($customerPhone),
             'message' => pSQL($message, true),
             'mail_sent' => $mailSent ? 1 : 0,
             'date_add' => date('Y-m-d H:i:s'),

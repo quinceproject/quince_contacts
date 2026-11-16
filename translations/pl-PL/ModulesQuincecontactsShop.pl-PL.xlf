@@ -67,6 +67,41 @@
         <target>Wyślij wiadomość</target>
       </trans-unit>
 
+
+      <!-- 0.5.0: telefon w formularzu i domyślna treść potwierdzenia -->
+      <trans-unit id="quince.contacts.shop.empty">
+        <source>Fill in the fields marked with an asterisk.</source>
+        <target>Wypełnij pola oznaczone gwiazdką.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.phone_invalid">
+        <source>This is not a valid phone number.</source>
+        <target>To nie jest prawidłowy numer telefonu.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.phone">
+        <source>Your phone number</source>
+        <target>Twój numer telefonu</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.confirm_subject">
+        <source>We have your message</source>
+        <target>Mamy Twoją wiadomość</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.confirm_hello">
+        <source>Hello {name},</source>
+        <target>Dzień dobry, {name},</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.confirm_thanks">
+        <source>thank you for your message about &lt;strong&gt;{product_name}&lt;/strong&gt;. We will reply as soon as we can, usually within one business day.</source>
+        <target>dziękujemy za wiadomość w sprawie &lt;strong&gt;{product_name}&lt;/strong&gt;. Odpowiemy najszybciej, jak to możliwe, zwykle w ciągu jednego dnia roboczego.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.confirm_your">
+        <source>Your message:</source>
+        <target>Twoja wiadomość:</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.confirm_reply">
+        <source>We will reply to: {email}, {phone}</source>
+        <target>Odpowiemy na: {email}, {phone}</target>
+      </trans-unit>
+
     </body>
   </file>
 </xliff>

@@ -260,6 +260,88 @@
             </div>
         </div>
     </div>
+
+    {# ── Pola formularza „Napisz do nas” ──
+       Makieta: quince/makiety/panel-kontakty-formularz-potwierdzenie.html. #}
+    <div class="qc-card">
+        <div class="qc-card-head">
+            <div>
+                <div class="qc-card-title">{{ 'Form “Write to us”'|trans }}</div>
+                <div class="qc-card-desc">{{ 'The fields the customer sees in the “Need a hand?” drawer, and the ones they must fill in.'|trans }}</div>
+            </div>
+        </div>
+
+        <div class="qc-card-body">
+            <table class="qc-table">
+                <thead>
+                    <tr>
+                        <th>{{ 'Field'|trans }}</th>
+                        <th>{{ 'Show'|trans }}</th>
+                        <th>{{ 'Required'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set etykiety = {name: 'Name'|trans, phone: 'Phone number'|trans} %}
+                    {% for pole in ['name', 'email', 'phone', 'message'] %}
+                        <tr>
+                            {% if pole in ['email', 'message'] %}
+                                {# Zawsze widoczne i obowiązkowe: przełączniki tylko pokazują stan. #}
+                                <td>
+                                    {{ pole == 'email' ? 'E-mail address'|trans : 'Message'|trans }}
+                                    <div class="qc-hint">
+                                        {{ pole == 'email'
+                                            ? 'Always: this is the address you reply to.'|trans
+                                            : 'Always: without it there is nothing to talk about.'|trans }}
+                                    </div>
+                                </td>
+                                {% for kolumna in 1..2 %}
+                                    <td>
+                                        <label class="qc-toggle">
+                                            <input type="checkbox" checked disabled>
+                                            <span class="qc-toggle-track"></span>
+                                        </label>
+                                    </td>
+                                {% endfor %}
+                            {% else %}
+                                <td>{{ etykiety[pole] }}</td>
+                                <td>{{ fields.toggle('field[' ~ pole ~ '][show]', formFields[pole].show) }}</td>
+                                <td>{{ fields.toggle('field[' ~ pole ~ '][required]', formFields[pole].required) }}</td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="qc-hint">{{ 'A hidden field is never required.'|trans }}</div>
+        </div>
+    </div>
+
+    {# ── Potwierdzenie dla klienta ──
+       Temat i treść jak w karcie „Teksty, które czyta klient” modułu Offers. #}
+    <div class="qc-card">
+        <div class="qc-card-head">
+            <div>
+                <div class="qc-card-title">{{ 'Confirmation for the customer'|trans }}</div>
+                <div class="qc-card-desc">{{ 'The email the customer gets right after sending the form, in the language they browse the shop in.'|trans }}</div>
+            </div>
+        </div>
+
+        <div class="qc-card-body">
+            <div class="qc-field">
+                {{ fields.toggle('confirm[enabled]', confirm.enabled, 'Send the customer a confirmation'|trans) }}
+            </div>
+
+            <div class="qc-field">
+                {{ fields.toggle('confirm[copy]', confirm.copy, 'Send a copy to the person the customer wrote to'|trans) }}
+                <div class="qc-hint">{{ 'The same text the customer gets, to the address of the product’s person from the list above. They see what the customer received.'|trans }}</div>
+            </div>
+
+            {{ fields.multilang('confirm[subject]', 'Email subject'|trans, languages, confirm.subjects, '',
+                'What the customer sees in the inbox before opening anything. You can use {shop_name} and {product_name}.'|trans) }}
+
+            {{ fields.multilangArea('confirm[body]', 'Email message (HTML)'|trans, languages, confirm.bodies, '',
+                'HTML code. You can use: {logo} (the logo from the appearance settings), {name}, {email}, {phone} (what the customer entered in the form), {product_name}, {message}, {shop_name}. A field the customer did not fill in stays empty. Customer data goes into the email as plain text. Empty text in a language: the customer gets the text in the shop’s default language.'|trans, 11) }}
+        </div>
+    </div>
 </form>
 
 <script>

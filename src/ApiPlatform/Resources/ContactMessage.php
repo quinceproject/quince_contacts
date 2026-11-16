@@ -75,6 +75,9 @@ class ContactMessage
 
     public string $customerEmail = '';
 
+    /** Telefon z formularza. Pusty, gdy klient go nie podał albo sklep schował pole. */
+    public string $customerPhone = '';
+
     public string $message = '';
 
     /** Czy mail do eksperta faktycznie wyszedł. */

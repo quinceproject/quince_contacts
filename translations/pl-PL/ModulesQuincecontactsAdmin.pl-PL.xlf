@@ -152,6 +152,81 @@
         <target>Tę rolę może mieć tylko jedna osoba. Pokazują ją produkty z kategorii bez przypisanej osoby; bez niej te strony nie mają przycisku „Zapytaj specjalistę”.</target>
       </trans-unit>
 
+
+      <!-- 0.5.0: pola formularza „Napisz do nas” i potwierdzenie dla klienta -->
+      <trans-unit id="quince.contacts.form.form_title">
+        <source>Form “Write to us”</source>
+        <target>Formularz „Napisz do nas”</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.form_desc">
+        <source>The fields the customer sees in the “Need a hand?” drawer, and the ones they must fill in.</source>
+        <target>Pola, które klient widzi w szufladzie „Potrzebujesz pomocy?”, i te, które musi wypełnić.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.field">
+        <source>Field</source>
+        <target>Pole</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.show">
+        <source>Show</source>
+        <target>Pokazuj</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.required">
+        <source>Required</source>
+        <target>Obowiązkowe</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.message">
+        <source>Message</source>
+        <target>Wiadomość</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.email_always">
+        <source>Always: this is the address you reply to.</source>
+        <target>Zawsze: na ten adres odpowiadasz.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.message_always">
+        <source>Always: without it there is nothing to talk about.</source>
+        <target>Zawsze: bez niej nie ma o czym rozmawiać.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.hidden_never_required">
+        <source>A hidden field is never required.</source>
+        <target>Pole schowane nigdy nie jest obowiązkowe.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.confirm_title">
+        <source>Confirmation for the customer</source>
+        <target>Potwierdzenie dla klienta</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.confirm_desc">
+        <source>The email the customer gets right after sending the form, in the language they browse the shop in.</source>
+        <target>Mail, który klient dostaje zaraz po wysłaniu formularza, w języku, w którym przegląda sklep.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.confirm_enable">
+        <source>Send the customer a confirmation</source>
+        <target>Wysyłaj klientowi potwierdzenie</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.confirm_copy">
+        <source>Send a copy to the person the customer wrote to</source>
+        <target>Wysyłaj kopię do osoby, do której klient napisał</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.confirm_copy_hint">
+        <source>The same text the customer gets, to the address of the product’s person from the list above. They see what the customer received.</source>
+        <target>Ta sama treść, co u klienta, na adres opiekuna produktu z listy wyżej. Widzi, co klient dostał.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.subject">
+        <source>Email subject</source>
+        <target>Temat maila</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.subject_hint">
+        <source>What the customer sees in the inbox before opening anything. You can use {shop_name} and {product_name}.</source>
+        <target>Co klient widzi w skrzynce, zanim otworzy mail. Możesz wstawić {shop_name} i {product_name}.</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.body">
+        <source>Email message (HTML)</source>
+        <target>Treść maila (HTML)</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.form.body_hint">
+        <source>HTML code. You can use: {logo} (the logo from the appearance settings), {name}, {email}, {phone} (what the customer entered in the form), {product_name}, {message}, {shop_name}. A field the customer did not fill in stays empty. Customer data goes into the email as plain text. Empty text in a language: the customer gets the text in the shop’s default language.</source>
+        <target>Kod HTML. Możesz wstawić: {logo} (logo z ustawień wyglądu), {name}, {email}, {phone} (dane, które klient zostawił w formularzu), {product_name}, {message}, {shop_name}. Pole, którego klient nie wypełnił, zostaje puste. Dane klienta trafiają do maila jako zwykły tekst. Pusta treść w danym języku: klient dostaje treść w języku domyślnym sklepu.</target>
+      </trans-unit>
+
     </body>
   </file>
 </xliff>

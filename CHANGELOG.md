@@ -4,6 +4,29 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-11-16
+
+### Added
+
+- Phone number in the "Write to us" form of the "Ask an expert" drawer. It goes to
+  the e-mail to the specialist, to the enquiry log, to the `contact.enquiry` event
+  (`data.sender.phone`) and to the Admin API (`customerPhone` on
+  `/quince-contacts/messages`). Needs the Quince theme 0.1.9 for the form check.
+- Card "Form “Write to us”" on the Contacts screen: show or hide the name and the
+  phone field and make them required. The e-mail and the message are always shown
+  and required.
+- Card "Confirmation for the customer": an e-mail to the customer right after the
+  form is sent, in the language they browse the shop in, with an optional copy to
+  the person they wrote to. Subject and HTML text per language; variables `{logo}`
+  (logo from the shop's appearance settings), `{name}`, `{email}`, `{phone}`,
+  `{product_name}`, `{message}`, `{shop_name}`. Off by default.
+
+### Security
+
+- The confirmation text is cleaned when saved: no scripts, frames, forms, event
+  attributes or `javascript:` links. Customer data put into the e-mail is always
+  escaped, so the form cannot inject markup or links.
+
 ## [0.4.8] - 2026-11-16
 
 ### Changed

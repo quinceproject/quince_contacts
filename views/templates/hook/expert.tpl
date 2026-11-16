@@ -10,8 +10,9 @@
  *}
 <div class="q-expert" data-q-expert-root
   data-url="{$quinceExpertUrl}"
-  data-msg-empty="{l s='Fill in the email and the message.' d='Modules.Quincecontacts.Shop'}"
+  data-msg-empty="{l s='Fill in the fields marked with an asterisk.' d='Modules.Quincecontacts.Shop'}"
   data-msg-invalid="{l s='This is not a valid email address.' d='Modules.Quincecontacts.Shop'}"
+  data-msg-phone="{l s='This is not a valid phone number.' d='Modules.Quincecontacts.Shop'}"
   data-msg-failure="{l s='The message could not be sent. Please try again in a moment.' d='Modules.Quincecontacts.Shop'}">
 
   <button type="button" class="q-btn q-btn--secondary q-btn--quiet" data-q-expert-open>
@@ -83,28 +84,45 @@
 
         {* Pływająca etykieta jak w pozostałych formularzach motywu: napis siada
            w pustym polu, a przy pisaniu wchodzi w górną kreskę. *}
-        <div class="q-float q-expert__field">
-          <label class="form-label" for="q-expert-name">
-            {l s='Your name' d='Modules.Quincecontacts.Shop'}
-          </label>
-          <input class="q-field form-control" type="text" id="q-expert-name"
-                 name="name" placeholder=" " autocomplete="name" data-q-expert-name>
-        </div>
+        {* Które pola stoją i które są obowiązkowe, ustawia sklep na ekranie
+           Kontakty. E-mail i wiadomość są zawsze. Obowiązkowe niesie atrybut
+           `data-q-required`: wyspa sprawdza każde pole, które go ma. *}
+        {if $quinceExpertFields.name.show}
+          <div class="q-float q-expert__field">
+            <label class="form-label{if $quinceExpertFields.name.required} required{/if}" for="q-expert-name">
+              {l s='Your name' d='Modules.Quincecontacts.Shop'}
+            </label>
+            <input class="q-field form-control" type="text" id="q-expert-name" maxlength="128"
+                   name="name" placeholder=" " autocomplete="name" data-q-expert-name
+                   {if $quinceExpertFields.name.required}data-q-required{/if}>
+          </div>
+        {/if}
 
         <div class="q-float q-expert__field">
           <label class="form-label required" for="q-expert-email">
             {l s='Your email address' d='Modules.Quincecontacts.Shop'}
           </label>
           <input class="q-field form-control" type="email" id="q-expert-email"
-                 name="email" placeholder=" " autocomplete="email" data-q-expert-email>
+                 name="email" placeholder=" " autocomplete="email" data-q-expert-email data-q-required>
         </div>
+
+        {if $quinceExpertFields.phone.show}
+          <div class="q-float q-expert__field">
+            <label class="form-label{if $quinceExpertFields.phone.required} required{/if}" for="q-expert-phone">
+              {l s='Your phone number' d='Modules.Quincecontacts.Shop'}
+            </label>
+            <input class="q-field form-control" type="tel" id="q-expert-phone" maxlength="64"
+                   name="phone" placeholder=" " autocomplete="tel" data-q-expert-phone
+                   {if $quinceExpertFields.phone.required}data-q-required{/if}>
+          </div>
+        {/if}
 
         <div class="q-float q-expert__field">
           <label class="form-label required" for="q-expert-message">
             {l s='Your message' d='Modules.Quincecontacts.Shop'}
           </label>
           <textarea class="q-field form-control" id="q-expert-message" rows="4"
-                    name="message" placeholder=" " data-q-expert-message></textarea>
+                    name="message" placeholder=" " data-q-expert-message data-q-required></textarea>
         </div>
 
         <p class="q-expert__hint" data-q-expert-hint aria-live="polite" hidden></p>

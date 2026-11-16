@@ -19,6 +19,7 @@ use PrestaShop\PrestaShop\Core\Domain\Shop\ValueObject\ShopConstraint;
 use PrestaShop\PrestaShop\Core\ExtraProperty\Value\ExtraPropertyReaderInterface;
 use PrestaShop\PrestaShop\Core\ExtraProperty\Value\ExtraPropertyWriterInterface;
 use PrestaShopBundle\Security\Attribute\AdminSecurity;
+use Quince\Contacts\Settings\FormSettings;
 use Quince\Contacts\Settings\People;
 use Quince\Contacts\Settings\PhotoStore;
 use Quince\Engine\Controller\Admin\QuinceController;
@@ -62,7 +63,16 @@ class PeopleController extends QuinceController
             $osoby[] = $osoba;
         }
 
+        $formularz = new FormSettings();
+
         return $this->renderPanel('@Modules/quince_contacts/views/templates/admin/people.html.twig', [
+            'formFields' => $formularz->fields(),
+            'confirm' => [
+                'enabled' => $formularz->confirmEnabled(),
+                'copy' => $formularz->copyEnabled(),
+                'subjects' => $formularz->subjects(),
+                'bodies' => $formularz->bodies(),
+            ],
             'people' => $osoby,
             'languages' => $this->languages(),
             'available' => $this->people->available($idLang),
@@ -155,6 +165,9 @@ class PeopleController extends QuinceController
         }
 
         $this->zapiszDomyslna($wiersze);
+
+        // Pola formularza i potwierdzenie dla klienta: te same zapisy ekranu.
+        (new FormSettings())->save($request->request->all());
 
         $this->addFlash('success', $this->trans('Settings saved.', 'Modules.Quincecontacts.Admin'));
 

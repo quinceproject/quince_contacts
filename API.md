@@ -78,6 +78,14 @@ The three do not depend on each other. With no Quince Events receiver the row is
 still written, and a failed e-mail shows in the log as `mailSent: false` while the
 row is still there.
 
+The `contact.enquiry` event carries the same customer data under `data.sender`:
+`id_customer`, `email`, `name` and, since 0.5.0, `phone` (empty when not given or
+hidden).
+
+When the shop switches on the confirmation for the customer, the customer also gets
+an e-mail right after sending the form. It is not part of the log or the event: it
+changes nothing for an integration.
+
 ### 3.1 List
 
 ```http
@@ -120,6 +128,7 @@ GET /admin-api/quince-contacts/messages/{id}?shopId=1
   "customerId": 0,
   "customerName": "John Test",
   "customerEmail": "customer.test@example.com",
+  "customerPhone": "+48 600 000 000",
   "message": "A test question about the product",
   "mailSent": false,
   "createdAt": "2026-10-29T15:44:01"
@@ -130,6 +139,7 @@ GET /admin-api/quince-contacts/messages/{id}?shopId=1
 |---|---|
 | `contactId`, `expertName`, `expertEmail` | the specialist the enquiry went to, **as they were when it was sent**, not read live from the contact. The contact may have changed or been deleted since; the log shows who received it then |
 | `customerId` | `0` means a guest. The shop does not guess a guest's identity from the e-mail address; matching to an existing customer is up to the polling system |
+| `customerName`, `customerPhone` | what the customer typed in the form. Empty when the field was left blank or the shop hid it (Quince Contacts screen, card "Form “Write to us”"). `customerPhone` exists since 0.5.0; rows written before that have it empty |
 | `mailSent` | whether `Mail::Send()` reported success when the enquiry was sent. `false` means the mail was not sent, not that the log row is wrong |
 | `createdAt` | **without a time zone offset.** The database column is a plain MySQL `DATETIME` in the shop server's time. If the integration needs a time zone, treat it as the shop server's local time, not UTC |
 
