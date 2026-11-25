@@ -127,7 +127,7 @@ final class MailLayout
         $wiersze = '<div style="font-weight:700">' . $this->e($imie) . '</div>';
 
         if ($stanowisko !== '') {
-            $wiersze .= '<div style="color:' . self::MUTED . ';font-size:13px;padding:0 0 6px">' . $this->e($stanowisko) . '</div>';
+            $wiersze .= $this->block($this->e($stanowisko), '0 0 6px', 'color:' . self::MUTED . ';font-size:13px;line-height:20px');
         }
 
         if ($telefon !== '') {
@@ -150,8 +150,12 @@ final class MailLayout
     public function messageBox(string $tresc, string $etykieta): string
     {
         return $this->label($etykieta)
-            . '<div style="background:' . self::BOX . ';border-left:4px solid ' . $this->color('QUINCE_PRIMARY', self::DEFAULT_PRIMARY)
-            . ';padding:16px 20px;color:' . self::TEXT . '">' . nl2br($this->e($tresc)) . '</div>';
+            . $this->block(
+                nl2br($this->e($tresc)),
+                '16px 20px',
+                'background:' . self::BOX . ';border-left:4px solid ' . $this->color('QUINCE_PRIMARY', self::DEFAULT_PRIMARY)
+                . ';color:' . self::TEXT . ';font-size:15px;line-height:24px'
+            );
     }
 
     /**
@@ -188,16 +192,25 @@ final class MailLayout
             . $html . '</table>';
     }
 
-    /** Przycisk w kolorze sklepu. */
+    /**
+     * Przycisk w kolorze sklepu. Odstęp nad nim i wypełnienie siedzą na
+     * komórkach, nie na tabeli i odnośniku: Outlook na Windows (silnik Worda)
+     * pomija marginesy tabel i wypełnienie odnośników.
+     */
     public function button(string $tekst, string $adres): string
     {
         $glowny = $this->color('QUINCE_PRIMARY', self::DEFAULT_PRIMARY);
-        $naglowki = $this->stack($this->font('QUINCE_FONT_HEADING', self::DEFAULT_FONT_HEADING));
+        $styl = 'font-family:' . $this->stack($this->font('QUINCE_FONT_HEADING', self::DEFAULT_FONT_HEADING))
+            . ';font-size:13px;font-weight:700;letter-spacing:0.65px;text-transform:uppercase;color:' . $this->textOn($glowny) . ';text-decoration:none';
 
-        return '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 8px"><tr>'
-            . '<td style="background:' . $glowny . '"><a href="' . $this->e($adres) . '" style="display:inline-block;padding:0 22px;line-height:46px;font-family:'
-            . $naglowki . ';font-size:13px;font-weight:700;letter-spacing:0.65px;text-transform:uppercase;color:' . $this->textOn($glowny)
-            . ';text-decoration:none">' . $this->e($tekst) . '</a></td></tr></table>';
+        return $this->block(
+            '<table role="presentation" cellpadding="0" cellspacing="0"><tr>'
+            . '<td align="center" valign="middle" height="46" bgcolor="' . $glowny . '" style="background:' . $glowny
+            . ';height:46px;padding:0 24px;mso-padding-alt:0 24px;' . $styl . '">'
+            . '<a href="' . $this->e($adres) . '" style="display:inline-block;line-height:46px;' . $styl . '">' . $this->e($tekst) . '</a>'
+            . '</td></tr></table>',
+            '32px 0 8px'
+        );
     }
 
     public function trans(string $tekst, int $idLang): string
@@ -314,8 +327,22 @@ final class MailLayout
 
     private function label(string $tekst, string $odstep = '24px 0 6px'): string
     {
-        return '<div style="font-size:12px;line-height:20px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:'
-            . self::MUTED . ';padding:' . $odstep . '">' . $this->e($tekst) . '</div>';
+        return $this->block(
+            $this->e($tekst),
+            $odstep,
+            'font-size:12px;line-height:20px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:' . self::MUTED
+        );
+    }
+
+    /**
+     * Odstęp jako wypełnienie komórki tabeli. Outlook na Windows pomija
+     * marginesy i wypełnienie bloków `div`, więc elementy się sklejają;
+     * wypełnienie komórki stosuje każdy program pocztowy.
+     */
+    private function block(string $html, string $odstep, string $styl = ''): string
+    {
+        return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:' . $odstep
+            . ($styl !== '' ? ';' . $styl : '') . '">' . $html . '</td></tr></table>';
     }
 
     /** Barwa z ustawień silnika, tylko w postaci #rrggbb. */

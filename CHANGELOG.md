@@ -4,6 +4,15 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 2026-11-25
+
+### Fixed
+
+- Emails in Outlook for Windows: the elements no longer stick together (headings,
+  the customer's message box, the buttons and the text around them), and the
+  buttons have their full height and side padding. Outlook ignores spacing on `div`
+  blocks, table margins and link padding, so the spacing now sits on table cells.
+
 ## [0.6.0] - 2026-11-25
 
 ### Changed
