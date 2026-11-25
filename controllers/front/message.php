@@ -13,6 +13,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use Quince\Contacts\Mail\MailLayout;
 use Quince\Contacts\Settings\FormSettings;
 use Quince\Contacts\Settings\MessageLog;
 use Quince\Contacts\Settings\People;
@@ -113,6 +114,9 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
         }
 
         $idLang = (int) $this->context->language->id;
+        $wyglad = new MailLayout($this->context);
+        $produktZmienne = $wyglad->product($produkt, $wyglad->trans('Your question is about', $idLang));
+
         $dane = [
             'name' => $imie,
             'email' => $email,
@@ -120,6 +124,13 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
             'message' => $tresc,
             'product_name' => (string) $produkt->name,
             'shop_name' => (string) Configuration::get('PS_SHOP_NAME'),
+            'product_reference' => (string) $produkt->reference,
+            'product_price' => html_entity_decode($produktZmienne['{product_price}'], ENT_QUOTES, 'UTF-8'),
+            'product_url' => html_entity_decode($produktZmienne['{product_url}'], ENT_QUOTES, 'UTF-8'),
+            'expert_name' => (string) $osoba['name'],
+            'expert_job' => (string) ($osoba['job'] ?? ''),
+            'expert_phone' => (string) ($osoba['phone'] ?? ''),
+            'expert_email' => (string) $osoba['email'],
         ];
 
         $szablon = $ustawienia->bodyFor($idLang);
@@ -128,7 +139,18 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
             return;
         }
 
-        $html = $ustawienia->render($szablon, $dane);
+        $bloki = [
+            '{product_card}' => $produktZmienne['{product_card}'],
+            '{expert_card}' => $wyglad->expertCard($osoba, $wyglad->trans('You will hear from', $idLang)),
+            '{message_box}' => $wyglad->messageBox($tresc, $wyglad->trans('Your message', $idLang)),
+            '{reply_to}' => $wyglad->rows($wyglad->trans('We will reply to', $idLang), [
+                $wyglad->trans('Email', $idLang) => $email,
+                $wyglad->trans('Phone', $idLang) => $telefon,
+            ]),
+            '{product_button}' => $wyglad->button($wyglad->trans('Back to the product', $idLang), $dane['product_url']),
+        ];
+
+        $html = $ustawienia->render($szablon, $dane, $bloki);
         $temat = $ustawienia->renderSubject($ustawienia->subjectFor($idLang), $dane);
         $kopia = $ustawienia->copyEnabled() && Validate::isEmail((string) $osoba['email'])
             ? (string) $osoba['email']
@@ -141,8 +163,8 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
             [
                 // Treść jest już złożona i escapowana w FormSettings::render().
                 '{content}' => $html,
-                '{content_text}' => trim(html_entity_decode(strip_tags(str_replace(['<br>', '<br />', '</p>'], "\n", $html)), ENT_QUOTES, 'UTF-8')),
-            ],
+                '{content_text}' => $this->tekst($html),
+            ] + $wyglad->common(),
             $email,
             $imie !== '' ? $imie : null,
             null,
@@ -170,23 +192,34 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
     private function mail(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt): bool
     {
         $nazwaSklepu = (string) Configuration::get('PS_SHOP_NAME');
+        // Szablon w języku, w którym klient pisał; etykiety bloków w tym samym.
+        $idLang = $this->jezykSzablonu((int) $this->context->language->id, 'quince_enquiry');
+        $wyglad = new MailLayout($this->context);
+        $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 
         return (bool) Mail::Send(
-            $this->jezykSzablonu((int) $this->context->language->id, 'quince_enquiry'),
+            $idLang,
             'quince_enquiry',
             $nazwaSklepu . ': ' . $produkt->name,
             [
-                '{shop_name}' => $nazwaSklepu,
-                '{expert_name}' => (string) $osoba['name'],
+                '{expert_name}' => $e((string) $osoba['name']),
                 // Mail::Send wkleja zmienne do HTML bez escapowania, a imię i adres
                 // wpisuje odwiedzający: bez tego wstawiłby do maila własny odnośnik.
-                '{customer_name}' => htmlspecialchars($imie, ENT_QUOTES, 'UTF-8'),
-                '{customer_email}' => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
-                '{customer_phone}' => htmlspecialchars($telefon !== '' ? $telefon : '-', ENT_QUOTES, 'UTF-8'),
-                '{message}' => nl2br(htmlspecialchars($tresc, ENT_QUOTES, 'UTF-8')),
-                '{product_name}' => (string) $produkt->name,
-                '{product_url}' => $this->context->link->getProductLink($produkt),
-            ],
+                '{customer_name}' => $e($imie),
+                '{customer_email}' => $e($email),
+                '{customer_phone}' => $e($telefon !== '' ? $telefon : '-'),
+                '{message}' => nl2br($e($tresc)),
+                '{message_text}' => $tresc,
+                '{customer_rows}' => $wyglad->rows($wyglad->trans('Customer', $idLang), [
+                    $wyglad->trans('Name', $idLang) => $imie,
+                    $wyglad->trans('Email', $idLang) => $email,
+                    $wyglad->trans('Phone', $idLang) => $telefon,
+                ], [
+                    $wyglad->trans('Email', $idLang) => 'mailto:' . $email,
+                    $wyglad->trans('Phone', $idLang) => 'tel:' . preg_replace('/[^0-9+]/', '', $telefon),
+                ]),
+                '{message_box}' => $wyglad->messageBox($tresc, $wyglad->trans('Message', $idLang)),
+            ] + $wyglad->product($produkt, $wyglad->trans('Product', $idLang)) + $wyglad->common(),
             (string) $osoba['email'],
             (string) $osoba['name'],
             null,
@@ -200,6 +233,19 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
             $email,
             $imie
         );
+    }
+
+    /**
+     * Wersja tekstowa treści potwierdzenia: bez znaczników, akapity i bloki
+     * w osobnych wierszach.
+     */
+    private function tekst(string $html): string
+    {
+        $html = (string) preg_replace('#<(br|/p|/div|/tr|/h1|/h2|/table)\b[^>]*>#i', "\n", $html);
+        $html = (string) preg_replace('#</td>#i', ' ', $html);
+        $tekst = html_entity_decode(strip_tags($html), ENT_QUOTES, 'UTF-8');
+
+        return trim((string) preg_replace("/[ \t]*\n[\s]*\n+/", "\n\n", $tekst));
     }
 
     /**

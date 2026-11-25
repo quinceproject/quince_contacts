@@ -1,12 +1,18 @@
 {shop_name}: a question about a product
 
-Hello {expert_name},
+Hello {expert_name}. A customer asked a question through the form on the product page.
 
-{customer_name} ({customer_email}) asks about {product_name}:
+Product: {product_name}
+SKU: {product_reference}
+Price: {product_price}
 {product_url}
+
+Customer: {customer_name}
+Email: {customer_email}
 Phone: {customer_phone}
 
-{message}
+Message:
+{message_text}
 
-Reply to this message and the answer goes straight to the customer.
+You can simply reply to this email. The answer goes straight to the customer.
 {shop_url}

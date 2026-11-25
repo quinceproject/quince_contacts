@@ -339,7 +339,7 @@
                 'What the customer sees in the inbox before opening anything. You can use {shop_name} and {product_name}.'|trans) }}
 
             {{ fields.multilangArea('confirm[body]', 'Email message (HTML)'|trans, languages, confirm.bodies, '',
-                'HTML code. You can use: {logo} (the logo from the appearance settings), {name}, {email}, {phone} (what the customer entered in the form), {product_name}, {message}, {shop_name}. A field the customer did not fill in stays empty. Customer data goes into the email as plain text. Empty text in a language: the customer gets the text in the shop’s default language.'|trans, 11) }}
+                'HTML code. The logo, the bar in the shop colour and the footer with the seller details come with the email itself. Ready blocks: {product_card} (the product with SKU and price), {expert_card} (the person who will reply), {message_box} (the customer’s message), {reply_to} (the customer’s email and phone), {product_button} (a button back to the product). Single values: {name}, {email}, {phone} (what the customer entered in the form), {product_name}, {product_reference}, {product_price}, {product_url}, {expert_name}, {expert_job}, {expert_phone}, {expert_email}, {message}, {shop_name}. A field the customer did not fill in stays empty. Customer data goes into the email as plain text. Empty text in a language: the customer gets the text in the shop’s default language.'|trans, 11) }}
         </div>
     </div>
 </form>

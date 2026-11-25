@@ -101,6 +101,72 @@
         <source>We will reply to: {email}, {phone}</source>
         <target>Odpowiemy na: {email}, {phone}</target>
       </trans-unit>
+      <trans-unit id="quince.contacts.shop.confirm_thanks2">
+        <source>thank you for your message. We will reply as soon as we can, usually within one business day.</source>
+        <target>dziękujemy za wiadomość. Odpowiemy najszybciej, jak to możliwe, zwykle w ciągu jednego dnia roboczego.</target>
+      </trans-unit>
+
+      <!-- Bloki maili (MailLayout) -->
+      <trans-unit id="quince.contacts.shop.mail.sku">
+        <source>SKU</source>
+        <target>SKU</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.price">
+        <source>Price</source>
+        <target>Cena</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.gross">
+        <source>gross</source>
+        <target>brutto</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.net">
+        <source>net</source>
+        <target>netto</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.product">
+        <source>Product</source>
+        <target>Produkt</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.question_about">
+        <source>Your question is about</source>
+        <target>Pytasz o produkt</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.customer">
+        <source>Customer</source>
+        <target>Klient</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.name">
+        <source>Name</source>
+        <target>Imię i nazwisko</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.email">
+        <source>Email</source>
+        <target>E-mail</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.phone">
+        <source>Phone</source>
+        <target>Telefon</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.message">
+        <source>Message</source>
+        <target>Wiadomość</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.your_message">
+        <source>Your message</source>
+        <target>Twoja wiadomość</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.expert">
+        <source>You will hear from</source>
+        <target>Odpowie Ci</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.reply_to">
+        <source>We will reply to</source>
+        <target>Odpowiemy na</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.back">
+        <source>Back to the product</source>
+        <target>Wróć do produktu</target>
+      </trans-unit>
 
     </body>
   </file>

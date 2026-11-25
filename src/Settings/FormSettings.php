@@ -66,13 +66,19 @@ final class FormSettings
 
     private const DEFAULT_SUBJECT = 'We have your message';
 
-    private const DEFAULT_BODY = '<p>{logo}</p>'
+    /**
+     * Logo, pasek w kolorze sklepu i stopkę z danymi sprzedawcy dokłada szablon
+     * maila. Treść zawiera tylko to, co między nimi; bloki w klamrach składa
+     * MailLayout.
+     */
+    private const DEFAULT_BODY = '<h1>We have your message</h1>'
         . '<p>Hello {name},</p>'
-        . '<p>thank you for your message about <strong>{product_name}</strong>. We will reply as soon as we can, usually within one business day.</p>'
-        . '<p>Your message:</p>'
-        . '<blockquote>{message}</blockquote>'
-        . '<p>We will reply to: {email}, {phone}</p>'
-        . '<p>{shop_name}</p>';
+        . '<p>thank you for your message. We will reply as soon as we can, usually within one business day.</p>'
+        . '<div>{product_card}</div>'
+        . '<div>{expert_card}</div>'
+        . '<div>{message_box}</div>'
+        . '<div>{reply_to}</div>'
+        . '<div>{product_button}</div>';
 
     /** @return array<string,array{show:bool,required:bool}> */
     public function fields(): array
@@ -168,22 +174,35 @@ final class FormSettings
      * Gotowa treść maila: zmienne podmienione na dane. Dane klienta i produktu
      * escapowane, wiadomość z zachowanymi przełamaniami wierszy.
      *
-     * @param array<string,string> $dane name, email, phone, message, product_name, shop_name
+     * @param array<string,string> $dane  name, email, phone, message, product_name, shop_name,
+     *                                    product_reference, product_price, product_url,
+     *                                    expert_name, expert_job, expert_phone, expert_email
+     * @param array<string,string> $bloki gotowy HTML bloków z MailLayout, np. '{product_card}'
      */
-    public function render(string $szablon, array $dane): string
+    public function render(string $szablon, array $dane, array $bloki = []): string
     {
         $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 
-        return strtr($szablon, [
+        $zmienne = [
             '{logo}' => $this->logoTag(),
-            '{name}' => $e($dane['name'] ?? ''),
-            '{email}' => $e($dane['email'] ?? ''),
-            '{phone}' => $e($dane['phone'] ?? ''),
             '{message}' => nl2br($e($dane['message'] ?? '')),
-            '{product_name}' => $e($dane['product_name'] ?? ''),
-            '{shop_name}' => $e($dane['shop_name'] ?? ''),
-        ]);
+        ];
+
+        foreach (['name', 'email', 'phone', 'product_name', 'shop_name', 'product_reference', 'product_price',
+            'product_url', 'expert_name', 'expert_job', 'expert_phone', 'expert_email'] as $pole) {
+            $zmienne['{' . $pole . '}'] = $e($dane[$pole] ?? '');
+        }
+
+        // Bloki są już złożone i escapowane w MailLayout.
+        foreach (self::BLOCKS as $blok) {
+            $zmienne[$blok] = (string) ($bloki[$blok] ?? '');
+        }
+
+        return strtr($szablon, $zmienne);
     }
+
+    /** Bloki, które sklep może wstawić do treści potwierdzenia. */
+    public const BLOCKS = ['{product_card}', '{expert_card}', '{message_box}', '{reply_to}', '{product_button}'];
 
     /** Temat z podstawionymi zmiennymi: zwykły tekst. */
     public function renderSubject(string $szablon, array $dane): string
@@ -298,13 +317,14 @@ final class FormSettings
         $d = 'Modules.Quincecontacts.Shop';
         $l = $locale ?: null;
 
-        return '<p>{logo}</p>'
+        return '<h1>' . $t->trans('We have your message', [], $d, $l) . '</h1>'
             . '<p>' . $t->trans('Hello {name},', [], $d, $l) . '</p>'
-            . '<p>' . $t->trans('thank you for your message about <strong>{product_name}</strong>. We will reply as soon as we can, usually within one business day.', [], $d, $l) . '</p>'
-            . '<p>' . $t->trans('Your message:', [], $d, $l) . '</p>'
-            . '<blockquote>{message}</blockquote>'
-            . '<p>' . $t->trans('We will reply to: {email}, {phone}', [], $d, $l) . '</p>'
-            . '<p>{shop_name}</p>';
+            . '<p>' . $t->trans('thank you for your message. We will reply as soon as we can, usually within one business day.', [], $d, $l) . '</p>'
+            . '<div>{product_card}</div>'
+            . '<div>{expert_card}</div>'
+            . '<div>{message_box}</div>'
+            . '<div>{reply_to}</div>'
+            . '<div>{product_button}</div>';
     }
 
     /** @param array<int,string> $teksty */

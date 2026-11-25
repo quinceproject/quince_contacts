@@ -1,12 +1,18 @@
 {shop_name}: pytanie o produkt
 
-Dzień dobry {expert_name},
+Dzień dobry, {expert_name}. Klient zadał pytanie przez formularz na karcie produktu.
 
-{customer_name} ({customer_email}) pyta o {product_name}:
+Produkt: {product_name}
+SKU: {product_reference}
+Cena: {product_price}
 {product_url}
+
+Klient: {customer_name}
+E-mail: {customer_email}
 Telefon: {customer_phone}
 
-{message}
+Wiadomość:
+{message_text}
 
-Odpowiedz na tę wiadomość, a odpowiedź trafi prosto do klienta.
+Możesz po prostu odpowiedzieć na tego maila. Odpowiedź trafi prosto do klienta.
 {shop_url}

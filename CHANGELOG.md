@@ -4,6 +4,28 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-11-25
+
+### Changed
+
+- Both emails (to the specialist and the confirmation to the customer) have a new
+  layout: the shop's email logo, a bar in the shop colour, the content on a white
+  card and a dark footer with the seller details. Colours and fonts come from the
+  engine appearance settings (Quince → Appearance), the seller details from Shop
+  Parameters → Contact → Stores.
+- The email to the specialist shows the product with SKU and price, the customer's
+  details, the message, and buttons to reply and to open the product.
+- The default confirmation text uses the new blocks. A text the shop already saved
+  stays as it is.
+
+### Added
+
+- Blocks for the confirmation text: `{product_card}`, `{expert_card}`,
+  `{message_box}`, `{reply_to}`, `{product_button}`.
+- Values for the confirmation text: `{product_reference}`, `{product_price}`
+  (gross, net in brackets), `{product_url}`, `{expert_name}`, `{expert_job}`,
+  `{expert_phone}`, `{expert_email}`.
+
 ## [0.5.0] - 2026-11-16
 
 ### Added
