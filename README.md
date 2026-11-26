@@ -29,6 +29,11 @@ one who sees a "contact us" form. The people are the shop's own contacts from
 - **"Ask an expert" on the product page.** A panel with the specialist's photo, job
   title and phone, and a form with name, e-mail address and message. The answer goes
   back to the address the customer gave.
+- **A contact button anywhere.** Any button with the `data-q-contact-open` attribute,
+  for example in a Quince Block on the home page, opens the same panel without a
+  product. The attribute names the person (the contact number), the topic goes into
+  the e-mail subject, and the e-mail says which page the customer wrote from. See
+  [Contact button outside the product page](#contact-button-outside-the-product-page).
 - **Every enquiry three ways.** An e-mail to the specialist, a `contact.enquiry` event
   through [Quince Events](https://github.com/quinceproject/quince_events) when that
   module is installed, and a row in the enquiry log. None of them depends on the
@@ -49,7 +54,7 @@ one who sees a "contact us" form. The people are the shop's own contacts from
 | PrestaShop  | 9.2 (tested on 9.2.0) |
 | PHP         | 8.4 (tested), 8.1 or newer required |
 | Quince Engine | required |
-| Quince theme | required for the "Ask an expert" panel on the product page |
+| Quince theme | required for the "Ask an expert" panel on the product page; 0.1.31 or newer for the contact button on other pages |
 | Quince Events | optional, for the `contact.enquiry` event |
 
 Quince Engine hosts the module's settings screen and protects the form. The module
@@ -116,6 +121,36 @@ next to the module in the Module Manager.
    Subcategories count together with the category.
 4. **Rest of the shop.** Optionally pick the one person shown for products from
    categories with nobody assigned.
+
+### Contact button outside the product page
+
+Since 0.7.0 the panel can be opened from any page, without a product. Put a button
+with these attributes in any HTML the shop controls, for example a Quince Block:
+
+```html
+<button type="button" class="q-btn q-btn--primary"
+        data-q-contact-open="12"
+        data-q-contact-topic="Didn't find a tool for your vehicle?">
+  Ask for an offer
+</button>
+```
+
+- `data-q-contact-open` is the number of the shop contact (**Shop Parameters →
+  Contact**, column ID) the enquiry goes to. Leave it empty
+  (`data-q-contact-open=""`) to send it to the person set for the rest of the shop.
+  A number of a person who is not on the list, or is switched off, also goes to that
+  person.
+- `data-q-contact-topic` is a short line saying what the button is about. It becomes
+  the e-mail subject ("Shop name: topic"), and the e-mail shows it together with the
+  address of the page the customer wrote from. Without it the subject says "A
+  question from the shop".
+- The panel shows the chosen person and the same form fields as on the product page.
+  The confirmation for the customer, when it is switched on, shows the topic instead
+  of the product card, and its button leads back to the page.
+
+The module adds the panel once at the end of every page (hook
+`displayBeforeBodyClosingTag`), and only when at least one person is on the list.
+Opening it from a button needs the Quince theme 0.1.31 or newer.
 
 ## Architecture
 

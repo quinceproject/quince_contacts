@@ -4,6 +4,29 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-11-26
+
+### Added
+
+- **Contact button on any page.** A button with `data-q-contact-open` anywhere in the
+  shop (for example in a Quince Block on the home page) opens the "Ask an expert"
+  panel without a product. The attribute names the person by contact number; empty
+  or unknown means the person set for the rest of the shop. `data-q-contact-topic`
+  gives the enquiry a topic. The panel is added once at the end of every page
+  (hook `displayBeforeBodyClosingTag`) when at least one person is on the list.
+  Needs the Quince theme 0.1.31 or newer.
+- **E-mail for an enquiry without a product** (`quince_enquiry_general`, English
+  and Polish). The subject is "Shop name: topic"; instead of the product card the
+  e-mail shows the topic and the page the customer wrote from, with a button to
+  open that page. Only an address of the shop itself is accepted as that page.
+- **Confirmation without a product.** When the confirmation is on, it shows the
+  topic instead of the product card and its button leads back to the page.
+  `{product_name}` in the subject and body becomes the topic.
+- **Enquiry log and Admin API**: new `topic` and `pageUrl` fields. The upgrade adds
+  both columns to the existing log.
+- **Event** `contact.enquiry`: an enquiry without a product carries
+  `context.page` (`topic`, `url`) instead of `context.product`.
+
 ## [0.6.1] - 2026-11-25
 
 ### Fixed

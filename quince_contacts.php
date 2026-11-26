@@ -47,7 +47,7 @@ class Quince_Contacts extends Module
     {
         $this->name = 'quince_contacts';
         $this->tab = 'front_office_features';
-        $this->version = '0.6.1';
+        $this->version = '0.7.0';
         $this->author = 'Quince Project';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '9.2.0', 'max' => '9.99.99'];
@@ -98,6 +98,7 @@ class Quince_Contacts extends Module
             && $this->addContactFields()
             && $this->registerHook('actionQuinceRegisterFeature')
             && $this->registerHook('displayQuinceExpert')
+            && $this->registerHook('displayBeforeBodyClosingTag')
             && $this->registerHook('actionObjectContactDeleteAfter');
     }
 
@@ -239,9 +240,66 @@ class Quince_Contacts extends Module
 
         $this->context->smarty->assign([
             'quinceExpert' => $osoba,
+            'quinceExpertGeneral' => false,
+            'quinceExpertIdPrefix' => 'q-expert',
             'quinceExpertPhoto' => (new PhotoStore())->url($osoba['photo']),
             'quinceExpertProduct' => (int) ($produkt['id_product'] ?? 0),
             // Które pola formularza pokazać i które są obowiązkowe (ekran Kontakty).
+            'quinceExpertFields' => (new \Quince\Contacts\Settings\FormSettings())->fields(),
+            'quinceExpertUrl' => $this->context->link->getModuleLink(
+                'quince_contacts',
+                'message',
+                ['ajax' => 1]
+            ),
+        ]);
+
+        return $this->display(__FILE__, 'views/templates/hook/expert.tpl');
+    }
+
+    /**
+     * Okno zapytania ogólnego, raz na stronę, na jej końcu.
+     *
+     * Otwiera je każdy przycisk z atrybutem `data-q-contact-open`, na przykład
+     * w bloku quince_block: `data-q-contact-open="12"` kieruje zapytanie do
+     * osoby z kontaktem numer 12, pusty atrybut do osoby domyślnej. Temat
+     * z `data-q-contact-topic` trafia do tematu maila. Okno stoi na każdej
+     * stronie, bo moduł nie wie, w którym bloku sklep postawi przycisk.
+     *
+     * Karty wszystkich włączonych osób idą w atrybucie okna: skrypt podmienia
+     * w nim osobę według przycisku, bez dodatkowego żądania do sklepu. To te
+     * same dane, które karta produktu i tak pokazuje klientowi.
+     */
+    public function hookDisplayBeforeBodyClosingTag(): string
+    {
+        $idLang = (int) $this->context->language->id;
+        $ludzie = new People();
+        $karty = $ludzie->activeCards($idLang);
+
+        if ($karty === []) {
+            return '';
+        }
+
+        $osoba = $ludzie->expert(0, $idLang) ?? reset($karty);
+        $zdjecia = new PhotoStore();
+        $dlaSkryptu = [];
+
+        foreach ($karty as $id => $karta) {
+            $dlaSkryptu[$id] = [
+                'name' => $karta['name'],
+                'job' => $karta['job'],
+                'phone' => $karta['phone'],
+                'email' => $karta['email'],
+                'photo' => $karta['photo'] !== '' ? $zdjecia->url($karta['photo']) : '',
+            ];
+        }
+
+        $this->context->smarty->assign([
+            'quinceExpert' => $osoba,
+            'quinceExpertGeneral' => true,
+            'quinceExpertIdPrefix' => 'q-contact',
+            'quinceExpertPeople' => (string) json_encode($dlaSkryptu, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'quinceExpertPhoto' => $osoba['photo'] !== '' ? $zdjecia->url($osoba['photo']) : '',
+            'quinceExpertProduct' => 0,
             'quinceExpertFields' => (new \Quince\Contacts\Settings\FormSettings())->fields(),
             'quinceExpertUrl' => $this->context->link->getModuleLink(
                 'quince_contacts',

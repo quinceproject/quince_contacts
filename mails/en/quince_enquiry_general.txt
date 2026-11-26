@@ -1,0 +1,16 @@
+{shop_name}: a question from the shop
+
+Hello {expert_name}. A customer asked a question through a form on the shop.
+
+Topic: {topic}
+Page: {page_url}
+
+Customer: {customer_name}
+Email: {customer_email}
+Phone: {customer_phone}
+
+Message:
+{message_text}
+
+You can simply reply to this email. The answer goes straight to the customer.
+{shop_url}

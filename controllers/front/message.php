@@ -73,27 +73,76 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
 
         $idLang = (int) $this->context->language->id;
         $idShop = (int) $this->context->shop->id;
-        $produkt = new Product($idProduct, false, $idLang, $idShop);
+        $produkt = null;
+        $temat = '';
+        $strona = '';
 
-        // Pisać można w sprawie produktu, który klient może zobaczyć w tym sklepie.
-        // Produkt widoczny, ale wyłączony ze sprzedaży, przechodzi.
-        if (!$produkt->id || !$produkt->active || $produkt->visibility === 'none'
-            || !$produkt->isAssociatedToShop($idShop)) {
-            return ['ok' => false, 'error' => 'product'];
+        if ($idProduct > 0) {
+            $produkt = new Product($idProduct, false, $idLang, $idShop);
+
+            // Pisać można w sprawie produktu, który klient może zobaczyć w tym sklepie.
+            // Produkt widoczny, ale wyłączony ze sprzedaży, przechodzi.
+            if (!$produkt->id || !$produkt->active || $produkt->visibility === 'none'
+                || !$produkt->isAssociatedToShop($idShop)) {
+                return ['ok' => false, 'error' => 'product'];
+            }
+
+            $osoba = (new People())->expertForCategory((int) $produkt->id_category_default, $idLang);
+        } else {
+            // Zapytanie ogólne: przycisk w bloku na dowolnej stronie. Osobę
+            // wskazuje przycisk numerem kontaktu, a bez niego dostaje je osoba
+            // domyślna sklepu. Temat to napis z przycisku, strona to adres,
+            // z którego klient pisał.
+            $temat = $this->temat((string) Tools::getValue('topic'));
+            $strona = $this->strona((string) Tools::getValue('page_url'));
+            $osoba = (new People())->expert((int) Tools::getValue('id_contact'), $idLang);
         }
-
-        $osoba = (new People())->expertForCategory((int) $produkt->id_category_default, $idLang);
 
         if ($osoba === null || !Validate::isEmail($osoba['email'])) {
             return ['ok' => false, 'error' => 'expert'];
         }
 
-        $wyslany = $this->mail($osoba, $email, $imie, $telefon, $tresc, $produkt);
-        $this->zdarzenie($osoba, $email, $imie, $telefon, $tresc, $produkt);
-        $this->zapisz($osoba, $email, $imie, $telefon, $tresc, $produkt, $wyslany);
-        $this->potwierdzenie($osoba, $email, $imie, $telefon, $tresc, $produkt);
+        $wyslany = $this->mail($osoba, $email, $imie, $telefon, $tresc, $produkt, $temat, $strona);
+        $this->zdarzenie($osoba, $email, $imie, $telefon, $tresc, $produkt, $temat, $strona);
+        $this->zapisz($osoba, $email, $imie, $telefon, $tresc, $produkt, $wyslany, $temat, $strona);
+        $this->potwierdzenie($osoba, $email, $imie, $telefon, $tresc, $produkt, $temat, $strona);
 
         return ['ok' => true, 'mail' => $wyslany, 'expert' => $osoba['name']];
+    }
+
+    /**
+     * Temat zapytania ogólnego: napis z przycisku, zwykły tekst w jednej linii.
+     * Przychodzi od przeglądarki, więc traktujemy go jak wpis klienta.
+     */
+    private function temat(string $tekst): string
+    {
+        $tekst = trim((string) preg_replace('/\s+/u', ' ', strip_tags($tekst)));
+
+        return mb_substr($tekst, 0, 255);
+    }
+
+    /**
+     * Adres strony, z której przyszło zapytanie. Tylko adres tego sklepu: obcy
+     * trafiłby do maila jako odnośnik, który handlowiec kliknie w zaufaniu.
+     * Obcy albo pusty daje adres strony głównej sklepu.
+     */
+    private function strona(string $adres): string
+    {
+        $adres = mb_substr(trim($adres), 0, 512);
+        $host = strtolower((string) parse_url($adres, PHP_URL_HOST));
+        $schemat = strtolower((string) parse_url($adres, PHP_URL_SCHEME));
+        $sklep = array_filter([
+            strtolower((string) Configuration::get('PS_SHOP_DOMAIN')),
+            strtolower((string) Configuration::get('PS_SHOP_DOMAIN_SSL')),
+            strtolower((string) $this->context->shop->domain),
+            strtolower((string) $this->context->shop->domain_ssl),
+        ]);
+
+        if ($host !== '' && in_array($schemat, ['http', 'https'], true) && in_array($host, $sklep, true)) {
+            return $adres;
+        }
+
+        return $this->context->link->getPageLink('index', true);
     }
 
     /**
@@ -105,7 +154,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      *
      * @param array<string,mixed> $osoba
      */
-    private function potwierdzenie(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt): void
+    private function potwierdzenie(array $osoba, string $email, string $imie, string $telefon, string $tresc, ?Product $produkt, string $temat = '', string $strona = ''): void
     {
         $ustawienia = new FormSettings();
 
@@ -115,16 +164,37 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
 
         $idLang = (int) $this->context->language->id;
         $wyglad = new MailLayout($this->context);
-        $produktZmienne = $wyglad->product($produkt, $wyglad->trans('Your question is about', $idLang));
+
+        // Zapytanie bez produktu: w miejsce karty produktu temat z przycisku,
+        // a przycisk powrotu prowadzi na stronę, z której klient pisał.
+        // Zmienne produktu w treści ustawionej przez sklep dostają temat
+        // i adres tej strony, więc gotowe treści nie zostają z pustymi miejscami.
+        if ($produkt === null) {
+            $produktZmienne = [
+                '{product_price}' => '',
+                '{product_url}' => htmlspecialchars($strona, ENT_QUOTES, 'UTF-8'),
+                '{product_card}' => $temat !== ''
+                    // Inny napis niż przy produkcie: „Your question is about”
+                    // ma po polsku tłumaczenie „Pytasz o produkt”.
+                    ? $wyglad->rows($wyglad->trans('Your question', $idLang), [
+                        $wyglad->trans('Topic', $idLang) => $temat,
+                    ])
+                    : '',
+            ];
+            $powrot = $wyglad->trans('Back to the page', $idLang);
+        } else {
+            $produktZmienne = $wyglad->product($produkt, $wyglad->trans('Your question is about', $idLang));
+            $powrot = $wyglad->trans('Back to the product', $idLang);
+        }
 
         $dane = [
             'name' => $imie,
             'email' => $email,
             'phone' => $telefon,
             'message' => $tresc,
-            'product_name' => (string) $produkt->name,
+            'product_name' => $produkt !== null ? (string) $produkt->name : $temat,
             'shop_name' => (string) Configuration::get('PS_SHOP_NAME'),
-            'product_reference' => (string) $produkt->reference,
+            'product_reference' => $produkt !== null ? (string) $produkt->reference : '',
             'product_price' => html_entity_decode($produktZmienne['{product_price}'], ENT_QUOTES, 'UTF-8'),
             'product_url' => html_entity_decode($produktZmienne['{product_url}'], ENT_QUOTES, 'UTF-8'),
             'expert_name' => (string) $osoba['name'],
@@ -147,7 +217,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
                 $wyglad->trans('Email', $idLang) => $email,
                 $wyglad->trans('Phone', $idLang) => $telefon,
             ]),
-            '{product_button}' => $wyglad->button($wyglad->trans('Back to the product', $idLang), $dane['product_url']),
+            '{product_button}' => $wyglad->button($powrot, $dane['product_url']),
         ];
 
         $html = $ustawienia->render($szablon, $dane, $bloki);
@@ -189,18 +259,38 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      *
      * @param array<string,mixed> $osoba
      */
-    private function mail(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt): bool
+    private function mail(array $osoba, string $email, string $imie, string $telefon, string $tresc, ?Product $produkt, string $temat = '', string $strona = ''): bool
     {
         $nazwaSklepu = (string) Configuration::get('PS_SHOP_NAME');
+        // Zapytanie bez produktu ma własny szablon: zamiast karty produktu
+        // temat z przycisku i strona, z której klient pisał.
+        $szablon = $produkt !== null ? 'quince_enquiry' : 'quince_enquiry_general';
         // Szablon w języku, w którym klient pisał; etykiety bloków w tym samym.
-        $idLang = $this->jezykSzablonu((int) $this->context->language->id, 'quince_enquiry');
+        $idLang = $this->jezykSzablonu((int) $this->context->language->id, $szablon);
         $wyglad = new MailLayout($this->context);
         $e = static fn (string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
 
+        if ($produkt !== null) {
+            $kontekst = $wyglad->product($produkt, $wyglad->trans('Product', $idLang));
+            $tytul = $nazwaSklepu . ': ' . $produkt->name;
+        } else {
+            $kontekst = [
+                '{topic}' => $e($temat),
+                '{page_url}' => $e($strona),
+                '{page_card}' => $wyglad->rows($wyglad->trans('Sent from', $idLang), [
+                    $wyglad->trans('Topic', $idLang) => $temat,
+                    $wyglad->trans('Page', $idLang) => $strona,
+                ], [
+                    $wyglad->trans('Page', $idLang) => $strona,
+                ]),
+            ];
+            $tytul = $nazwaSklepu . ': ' . ($temat !== '' ? $temat : $wyglad->trans('A question from the shop', $idLang));
+        }
+
         return (bool) Mail::Send(
             $idLang,
-            'quince_enquiry',
-            $nazwaSklepu . ': ' . $produkt->name,
+            $szablon,
+            $tytul,
             [
                 '{expert_name}' => $e((string) $osoba['name']),
                 // Mail::Send wkleja zmienne do HTML bez escapowania, a imię i adres
@@ -219,7 +309,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
                     $wyglad->trans('Phone', $idLang) => 'tel:' . preg_replace('/[^0-9+]/', '', $telefon),
                 ]),
                 '{message_box}' => $wyglad->messageBox($tresc, $wyglad->trans('Message', $idLang)),
-            ] + $wyglad->product($produkt, $wyglad->trans('Product', $idLang)) + $wyglad->common(),
+            ] + $kontekst + $wyglad->common(),
             (string) $osoba['email'],
             (string) $osoba['name'],
             null,
@@ -284,8 +374,26 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      *
      * @param array<string,mixed> $osoba
      */
-    private function zdarzenie(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt): void
+    private function zdarzenie(array $osoba, string $email, string $imie, string $telefon, string $tresc, ?Product $produkt, string $temat = '', string $strona = ''): void
     {
+        // Kontekst mówi, w jakiej sprawie klient pisał: o produkt albo
+        // z przycisku w bloku na stronie sklepu, z tematem tego przycisku.
+        $kontekst = $produkt !== null
+            ? [
+                'product' => [
+                    'id_product' => (int) $produkt->id,
+                    'name' => (string) $produkt->name,
+                    'reference' => (string) $produkt->reference,
+                    'url' => $this->context->link->getProductLink($produkt),
+                ],
+            ]
+            : [
+                'page' => [
+                    'topic' => $temat,
+                    'url' => $strona,
+                ],
+            ];
+
         $zdarzenia = Module::getInstanceByName('quince_events');
 
         if (!$zdarzenia || !class_exists(\Quince\Events\Event\EventDispatcher::class)) {
@@ -315,14 +423,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
                         'email' => (string) $osoba['email'],
                     ],
                 ],
-                context: [
-                    'product' => [
-                        'id_product' => (int) $produkt->id,
-                        'name' => (string) $produkt->name,
-                        'reference' => (string) $produkt->reference,
-                        'url' => $this->context->link->getProductLink($produkt),
-                    ],
-                ],
+                context: $kontekst,
                 source: 'quince_contacts'
             )
         );
@@ -333,7 +434,7 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
      *
      * @param array<string,mixed> $osoba
      */
-    private function zapisz(array $osoba, string $email, string $imie, string $telefon, string $tresc, Product $produkt, bool $wyslany): void
+    private function zapisz(array $osoba, string $email, string $imie, string $telefon, string $tresc, ?Product $produkt, bool $wyslany, string $temat = '', string $strona = ''): void
     {
         $idCustomer = (int) ($this->context->customer->id ?? 0) > 0 && $this->context->customer->isLogged()
             ? (int) $this->context->customer->id
@@ -342,14 +443,16 @@ class Quince_ContactsMessageModuleFrontController extends ModuleFrontController
         (new MessageLog())->record(
             (int) $this->context->shop->id,
             $osoba,
-            (int) $produkt->id,
-            (string) $produkt->name,
+            $produkt !== null ? (int) $produkt->id : 0,
+            $produkt !== null ? (string) $produkt->name : '',
             $idCustomer,
             $imie,
             $email,
             $tresc,
             $wyslany,
-            $telefon
+            $telefon,
+            $temat,
+            $strona
         );
     }
 }

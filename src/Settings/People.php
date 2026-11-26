@@ -324,6 +324,53 @@ final class People
         return $this->card($idContact, $idLang);
     }
 
+    /**
+     * Osoba wskazana z imienia, czyli numerem kontaktu: przycisk zapytania
+     * w bloku na dowolnej stronie (`data-q-contact-open="12"`).
+     *
+     * Numer pusty, nieznany albo osoby wyłączonej daje osobę domyślną sklepu:
+     * przycisk, którego osoba zniknęła z listy, ma dalej działać.
+     *
+     * @return array{id_contact:int,name:string,job:string,email:string,phone:string,photo:string}|null
+     */
+    public function expert(int $idContact, int $idLang): ?array
+    {
+        $karta = $idContact > 0 ? $this->card($idContact, $idLang) : null;
+
+        if ($karta !== null) {
+            return $karta;
+        }
+
+        $domyslna = $this->defaultExpert();
+
+        return $domyslna > 0 ? $this->card($domyslna, $idLang) : null;
+    }
+
+    /**
+     * Wszystkie włączone osoby jako karty, pod okno zapytania ogólnego: skrypt
+     * podmienia w nim osobę według przycisku, który okno otworzył.
+     *
+     * @return array<int,array{id_contact:int,name:string,job:string,email:string,phone:string,photo:string}>
+     */
+    public function activeCards(int $idLang): array
+    {
+        $wiersze = Db::getInstance()->executeS(
+            'SELECT id_contact FROM `' . _DB_PREFIX_ . self::TABLE . '` WHERE active = 1 ORDER BY position'
+        ) ?: [];
+
+        $karty = [];
+
+        foreach ($wiersze as $wiersz) {
+            $karta = $this->card((int) $wiersz['id_contact'], $idLang);
+
+            if ($karta !== null) {
+                $karty[$karta['id_contact']] = $karta;
+            }
+        }
+
+        return $karty;
+    }
+
     /** Osoba wskazana w ustawieniach na wypadek kategorii bez przypisania. */
     public function defaultExpert(): int
     {

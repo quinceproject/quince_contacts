@@ -167,6 +167,30 @@
         <source>Back to the product</source>
         <target>Wróć do produktu</target>
       </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.back_page">
+        <source>Back to the page</source>
+        <target>Wróć na stronę</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.your_question">
+        <source>Your question</source>
+        <target>Twoje pytanie</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.topic">
+        <source>Topic</source>
+        <target>Temat</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.page">
+        <source>Page</source>
+        <target>Strona</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.sent_from">
+        <source>Sent from</source>
+        <target>Wysłane ze strony</target>
+      </trans-unit>
+      <trans-unit id="quince.contacts.shop.mail.general_subject">
+        <source>A question from the shop</source>
+        <target>Pytanie ze strony sklepu</target>
+      </trans-unit>
 
     </body>
   </file>

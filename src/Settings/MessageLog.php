@@ -46,6 +46,8 @@ final class MessageLog
                 `expert_email` VARCHAR(255) NOT NULL DEFAULT "",
                 `id_product` INT(11) UNSIGNED NOT NULL,
                 `product_name` VARCHAR(255) NOT NULL DEFAULT "",
+                `topic` VARCHAR(255) NOT NULL DEFAULT "",
+                `page_url` VARCHAR(512) NOT NULL DEFAULT "",
                 `id_customer` INT(11) UNSIGNED NOT NULL DEFAULT 0,
                 `customer_name` VARCHAR(128) NOT NULL DEFAULT "",
                 `customer_email` VARCHAR(255) NOT NULL DEFAULT "",
@@ -79,6 +81,33 @@ final class MessageLog
         );
     }
 
+    /**
+     * Kolumny tematu i strony w tabeli założonej przed 0.7.0. Zapytanie bez
+     * produktu (przycisk w bloku na dowolnej stronie) niesie temat z przycisku
+     * i adres strony, z której przyszło, zamiast produktu.
+     */
+    public function addTopicColumns(): bool
+    {
+        $ok = true;
+
+        foreach ([
+            'topic' => 'VARCHAR(255) NOT NULL DEFAULT "" AFTER `product_name`',
+            'page_url' => 'VARCHAR(512) NOT NULL DEFAULT "" AFTER `topic`',
+        ] as $kolumna => $definicja) {
+            $jest = Db::getInstance()->executeS(
+                'SHOW COLUMNS FROM `' . _DB_PREFIX_ . self::TABLE . '` LIKE "' . $kolumna . '"'
+            );
+
+            if (empty($jest)) {
+                $ok = $ok && (bool) Db::getInstance()->execute(
+                    'ALTER TABLE `' . _DB_PREFIX_ . self::TABLE . '` ADD COLUMN `' . $kolumna . '` ' . $definicja
+                );
+            }
+        }
+
+        return $ok;
+    }
+
     public function dropTable(): bool
     {
         return (bool) Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . self::TABLE . '`');
@@ -95,7 +124,9 @@ final class MessageLog
         string $customerEmail,
         string $message,
         bool $mailSent,
-        string $customerPhone = ''
+        string $customerPhone = '',
+        string $topic = '',
+        string $pageUrl = ''
     ): bool {
         return Db::getInstance()->insert(self::TABLE, [
             'id_shop' => $idShop,
@@ -104,6 +135,8 @@ final class MessageLog
             'expert_email' => pSQL((string) $osoba['email']),
             'id_product' => $idProduct,
             'product_name' => pSQL($productName),
+            'topic' => pSQL(mb_substr($topic, 0, 255)),
+            'page_url' => pSQL(mb_substr($pageUrl, 0, 512)),
             'id_customer' => $idCustomer,
             'customer_name' => pSQL($customerName),
             'customer_email' => pSQL($customerEmail),

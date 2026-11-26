@@ -125,6 +125,8 @@ GET /admin-api/quince-contacts/messages/{id}?shopId=1
   "expertEmail": "mark.smith@example.com",
   "productId": 1,
   "productName": "Hummingbird printed t-shirt",
+  "topic": "",
+  "pageUrl": "",
   "customerId": 0,
   "customerName": "John Test",
   "customerEmail": "customer.test@example.com",
@@ -138,6 +140,7 @@ GET /admin-api/quince-contacts/messages/{id}?shopId=1
 | Field | Notes |
 |---|---|
 | `contactId`, `expertName`, `expertEmail` | the specialist the enquiry went to, **as they were when it was sent**, not read live from the contact. The contact may have changed or been deleted since; the log shows who received it then |
+| `productId`, `productName`, `topic`, `pageUrl` | an enquiry from the product page has the product and an empty `topic` and `pageUrl`. An enquiry from a contact button on any other page (since 0.7.0) has `productId` `0`, an empty `productName`, the button's topic in `topic` and the address of the page it was sent from in `pageUrl` |
 | `customerId` | `0` means a guest. The shop does not guess a guest's identity from the e-mail address; matching to an existing customer is up to the polling system |
 | `customerName`, `customerPhone` | what the customer typed in the form. Empty when the field was left blank or the shop hid it (Quince Contacts screen, card "Form “Write to us”"). `customerPhone` exists since 0.5.0; rows written before that have it empty |
 | `mailSent` | whether `Mail::Send()` reported success when the enquiry was sent. `false` means the mail was not sent, not that the log row is wrong |
@@ -150,7 +153,8 @@ GET /admin-api/quince-contacts/messages/{id}?shopId=1
 - **The specialist's job title and photo are not available through any API.** They
   live only in the module's tables and back office screen.
 - **No writing through the API.** Messages cannot be created, changed or deleted
-  through the Admin API; the only way in is the form on the product page.
+  through the Admin API; the only ways in are the form on the product page and the
+  contact button on other pages.
 - **No handling status.** The log does not know whether the specialist answered, read
   or ignored an enquiry. It records what the customer sent and to whom.
 - **No cleanup of old rows.** The table keeps growing. Uninstalling the module removes

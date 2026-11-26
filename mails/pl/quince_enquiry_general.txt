@@ -1,0 +1,16 @@
+{shop_name}: pytanie ze strony sklepu
+
+Dzień dobry, {expert_name}. Klient zadał pytanie przez formularz na stronie sklepu.
+
+Temat: {topic}
+Strona: {page_url}
+
+Klient: {customer_name}
+E-mail: {customer_email}
+Telefon: {customer_phone}
+
+Wiadomość:
+{message_text}
+
+Możesz po prostu odpowiedzieć na tego maila. Odpowiedź trafi prosto do klienta.
+{shop_url}

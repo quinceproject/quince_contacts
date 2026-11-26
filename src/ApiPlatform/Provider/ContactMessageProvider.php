@@ -84,6 +84,8 @@ final class ContactMessageProvider implements ProviderInterface
         $wynik->expertEmail = (string) $row['expert_email'];
         $wynik->productId = (int) $row['id_product'];
         $wynik->productName = (string) $row['product_name'];
+        $wynik->topic = (string) ($row['topic'] ?? '');
+        $wynik->pageUrl = (string) ($row['page_url'] ?? '');
         $wynik->customerId = (int) $row['id_customer'];
         $wynik->customerName = (string) $row['customer_name'];
         $wynik->customerEmail = (string) $row['customer_email'];

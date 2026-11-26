@@ -68,6 +68,15 @@ class ContactMessage
 
     public string $productName = '';
 
+    /**
+     * Zapytanie bez produktu (przycisk w bloku na stronie, od 0.7.0): temat
+     * z przycisku i adres strony, z której przyszło. Przy zapytaniu z karty
+     * produktu oba puste, a `productId` większe od zera.
+     */
+    public string $topic = '';
+
+    public string $pageUrl = '';
+
     /** Zero znaczy gościa. */
     public int $customerId = 0;
 
