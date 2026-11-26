@@ -4,6 +4,18 @@ All notable changes to this module are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the versioning follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2026-11-26
+
+### Fixed
+
+- **Upgrade to 0.7.0 stopped with "Hook with the name displayBeforeBodyClosingTag
+  has been registered by Quince_Contacts, but the corresponding method … has not
+  been defined"** on shops with the debug mode on. During an upgrade PrestaShop
+  still holds the old module class, without the new method, and refuses the hook.
+  The upgrade now adds the hook directly, the same way PrestaShop does, without
+  that check. A shop where 0.7.0 stopped finishes the upgrade with this version;
+  the log columns it already added stay as they are.
+
 ## [0.7.0] - 2026-11-26
 
 ### Added
